@@ -9,7 +9,7 @@ try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(sav
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
 function render(){
- saveGame();$('balance').textContent=money(balance);$('count').textContent=inventory.length;
+ saveGame();$('balance').textContent=money(balance);
  $('cases').setAttribute('aria-live','polite');$('inventory').setAttribute('aria-live','polite');
  const visibleCases=cases.filter(c=>activeFilter==='all'||(activeFilter==='knife'?c.id==='knife':c.id!=='knife'));
  $('cases').innerHTML=visibleCases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>Открыть кейс</button></article>`).join('');
@@ -46,7 +46,8 @@ function startBattle(){
  if(p>b)rounds.forEach(r=>inventory.push({name:r.p[0],icon:r.p[1],price:r.p[2]}));
  battleRunning=false;$('again-battle').onclick=()=>{$('battle-result').classList.add('hidden');renderBattle()};render();
 }
-$('start-battle').onclick=startBattle;\n$('hero-battle').onclick=()=>showTab('battle');\nfunction showTab(tab){
+$('start-battle').onclick=startBattle;
+function showTab(tab){
  document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
  ['cases','inventory','battle'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
  $('filter-row').classList.toggle('hidden',tab!=='cases');
