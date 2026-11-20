@@ -165,3 +165,9 @@ footer{padding-bottom:25px}
 .hero-battle-button span{font-size:28px}
 .hero-battle-button:active{transform:scale(.98)}
 .back-cases{margin:0 0 14px;padding:10px 15px;border:1px solid #454d72;border-radius:12px;background:#252a43;color:#dce1fa;font-weight:750}
+
+
+/* Restored battle navigation buttons */
+.hero-battle-button,.back-cases{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding:12px 20px;border:1px solid rgba(145,125,255,.55);border-radius:12px;background:linear-gradient(135deg,#7657ff,#4933b9);color:#fff;font-weight:700;}
+.back-cases{margin:0 0 14px;background:rgba(255,255,255,.08);}
+.hero-battle-button:active,.back-cases:active{transform:scale(.98)}
