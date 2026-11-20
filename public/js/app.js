@@ -4,14 +4,14 @@ const cases=[
 {id:'legend',name:'Легендарный кейс',price:700,icon:'🔥',drops:[['Glock-18 | Water Elemental','💧',900],['AK-47 | Fire Serpent','🐍',18000],['AWP | Hyper Beast','🦖',8500],['Karambit | Crimson Web','🕸️',32000]]},
 {id:'knife',name:'Ножевой кейс',price:1200,icon:'🔪',drops:[['Bayonet | Forest','🌳',6500],['Butterfly Knife | Waves','🦋',18000],['Karambit | Fade','🔪',24000],['Karambit | Ruby','💎',52000]]}
 ];
-let balance=1000,inventory=[],rolling=false,pending=null,battleSelection=[],battleRunning=false;
+let balance=1000,inventory=[],rolling=false,pending=null,battleSelection=[],battleRunning=false,activeFilter='all';
 try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)&&Array.isArray(saved.inventory)){balance=Math.max(0,saved.balance);inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)&&typeof x.icon==='string')}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
 function render(){
  saveGame();$('balance').textContent=money(balance);$('count').textContent=inventory.length;
  $('cases').setAttribute('aria-live','polite');$('inventory').setAttribute('aria-live','polite');
- $('cases').innerHTML=cases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>Открыть кейс</button></article>`).join('');
+ const visibleCases=cases.filter(c=>activeFilter==='all'||(activeFilter==='knife'?c.id==='knife':c.id!=='knife'));\n $('cases').innerHTML=visibleCases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>Открыть кейс</button></article>`).join('');
  $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>`<article class="case"><div class="art">${x.icon}</div><h3>${x.name}</h3><b class="price">${money(x.price)}</b><button data-sell="${i}">Продать</button></article>`).join(''):'<p class="muted">Инвентарь пуст — открой кейс!</p>';
  document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>openCase(b.dataset.case));
  document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
@@ -46,5 +46,20 @@ function startBattle(){
  battleRunning=false;$('again-battle').onclick=()=>{$('battle-result').classList.add('hidden');renderBattle()};render();
 }
 $('start-battle').onclick=startBattle;
-document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['cases','inventory','battle'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='battle')renderBattle()});
+function showTab(tab){
+ document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
+ ['cases','inventory','battle'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
+ $('filter-row').classList.toggle('hidden',tab!=='cases');
+ document.querySelector('.section-switch').classList.toggle('hidden',tab==='battle');
+ if(tab==='battle')renderBattle();
+ if(tab==='cases'||tab==='inventory')render();
+}
+document.querySelectorAll('.bottom-nav [data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>showTab(b.dataset.view));
+document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
+ activeFilter=b.dataset.filter;
+ document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));
+ render();
+});
+$('promo-battle').onclick=()=>showTab('battle');
 render();
