@@ -159,3 +159,9 @@ footer{padding-bottom:25px}
  .grid{grid-template-columns:1fr}
  .art{height:130px;flex-basis:130px}
 }
+
+/* Hero case-battle call to action */
+.hero-battle-button{display:flex;align-items:center;justify-content:space-between;gap:18px;width:min(100%,340px);min-height:66px;margin:17px 0 10px;padding:14px 22px;border:1px solid #a99bff;border-radius:18px;background:linear-gradient(115deg,#8173ff,#5948d3);color:#fff;font-size:clamp(19px,4vw,25px);font-weight:950;letter-spacing:.2px;box-shadow:0 10px 26px #5745df66,inset 0 1px #ffffff55}
+.hero-battle-button span{font-size:28px}
+.hero-battle-button:active{transform:scale(.98)}
+.back-cases{margin:0 0 14px;padding:10px 15px;border:1px solid #454d72;border-radius:12px;background:#252a43;color:#dce1fa;font-weight:750}
