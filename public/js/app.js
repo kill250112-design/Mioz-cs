@@ -4,8 +4,8 @@ const cases=[
 {id:'legend',name:'Легендарный кейс',price:700,icon:'🔥',drops:[['Glock-18 | Water Elemental','💧',900],['AK-47 | Fire Serpent','🐍',18000],['AWP | Hyper Beast','🦖',8500],['Karambit | Crimson Web','🕸️',32000]]},
 {id:'knife',name:'Ножевой кейс',price:1200,icon:'🔪',drops:[['Bayonet | Forest','🌳',6500],['Butterfly Knife | Waves','🦋',18000],['Karambit | Fade','🔪',24000],['Karambit | Ruby','💎',52000]]}
 ];
-let balance=1000,inventory=[],rolling=false,pending=null;
-const $=id=>document.getElementById(id), money=n=>n.toLocaleString('ru-RU')+' ₽';
+let balance=1000,inventory=[],rolling=false,pending=null,battleSelection=[],battleRunning=false;
+const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
 function render(){
  $('balance').textContent=money(balance);$('count').textContent=inventory.length;
  $('cases').innerHTML=cases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>Открыть кейс</button></article>`).join('');
@@ -16,13 +16,12 @@ function render(){
 function openCase(id){
  if(rolling)return;const c=cases.find(x=>x.id===id);if(balance<c.price)return;
  balance-=c.price;rolling=true;pending=c.drops[Math.floor(Math.random()*c.drops.length)];
- const overlay=$('modal');overlay.classList.remove('hidden');
- $('dropName').textContent='Крутим рулетку...';$('dropPrice').textContent='';
+ $('modal').classList.remove('hidden');$('dropName').textContent='Крутим рулетку...';$('dropPrice').textContent='';
  $('result').innerHTML='<div class="spin-track">'+Array.from({length:15},(_,i)=>'<span>'+c.drops[i%c.drops.length][1]+'</span>').join('')+'</div>';
- const track=$('result').firstElementChild;track.style.animation='roulette 2.8s cubic-bezier(.08,.72,.12,1) forwards';
- setTimeout(()=>{rolling=false;$('result').textContent=pending[1];$('dropName').textContent=pending[0];$('dropPrice').textContent=money(pending[2]);$('claim').textContent='Забрать в инвентарь';render()},2900);
- 
-let battleSelection=[],battleRunning=false;
+ setTimeout(()=>{rolling=false;$('result').textContent=pending[1];$('dropName').textContent=pending[0];$('dropPrice').textContent=money(pending[2]);$('claim').textContent='Забрать в инвентарь';render()},2900);render();
+}
+$('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
+$('close').onclick=()=>{if(!rolling)$('modal').classList.add('hidden')};
 function renderBattle(){
  const cost=battleSelection.reduce((s,id)=>s+cases.find(c=>c.id===id).price,0);
  $('battle-count').textContent=battleSelection.length+' / 3';$('battle-cost').textContent=money(cost);
@@ -43,10 +42,5 @@ function startBattle(){
  battleRunning=false;$('again-battle').onclick=()=>{$('battle-result').classList.add('hidden');renderBattle()};render();
 }
 $('start-battle').onclick=startBattle;
-
-render();
-}
-$('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
-$('close').onclick=()=>{if(!rolling)$('modal').classList.add('hidden')};
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['cases','inventory','battle'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='battle')renderBattle()});
 render();
