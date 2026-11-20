@@ -42,8 +42,8 @@ jobs:
           from pathlib import Path
           p = Path("_site/index.html")
           html = p.read_text(encoding="utf-8")
-          html = html.replace("</head>", '  <link rel="stylesheet" href="css/cs2-splash.css">\\n</head>', 1)
-          html = html.replace("</body>", '  <script src="js/cs2-splash.js"></script>\\n</body>', 1)
+          html = html.replace("</head>", '  <link rel="stylesheet" href="css/cs2-splash.css?v=3">\n</head>', 1)
+          html = html.replace("</body>", '  <script src="js/cs2-splash.js?v=3"></script>\n</body>', 1)
           p.write_text(html, encoding="utf-8")
           PY
 
