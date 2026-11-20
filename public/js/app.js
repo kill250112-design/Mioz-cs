@@ -20,9 +20,18 @@ function render(){
 function openCase(id){
  if(rolling)return;const c=cases.find(x=>x.id===id);if(balance<c.price)return;
  balance-=c.price;rolling=true;pending=c.drops[Math.floor(Math.random()*c.drops.length)];
- $('modal').classList.remove('hidden');$('dropName').textContent='Крутим рулетку...';$('dropPrice').textContent='';
- $('result').innerHTML='<div class="spin-track">'+Array.from({length:15},(_,i)=>'<span>'+c.drops[i%c.drops.length][1]+'</span>').join('')+'</div>';
- setTimeout(()=>{rolling=false;$('result').textContent=pending[1];$('dropName').textContent=pending[0];$('dropPrice').textContent=money(pending[2]);$('claim').textContent='Забрать в инвентарь';render()},2900);render();
+ $('modal').classList.remove('hidden');$('dropName').textContent='Крутим кейс...';$('dropPrice').textContent='';$('claim').textContent='Ожидай...';
+ const targetIndex=24,total=30;
+ const items=Array.from({length:total},(_,i)=>i===targetIndex?pending:c.drops[Math.floor(Math.random()*c.drops.length)]);
+ $('result').innerHTML='<div class="roulette-marker"></div><div class="spin-track">'+items.map(x=>'<span>'+x[1]+'</span>').join('')+'</div>';
+ const track=$('result').querySelector('.spin-track');
+ track.style.transform='translateX(0)';
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+   const card=track.querySelector('span'),step=card.getBoundingClientRect().width+12;
+   track.style.transform='translateX('+($('result').clientWidth/2-(targetIndex*step+card.getBoundingClientRect().width/2))+'px)';
+ }));
+ setTimeout(()=>{rolling=false;$('result').innerHTML='<div class="drop-reveal">'+pending[1]+'</div>';$('dropName').textContent=pending[0];$('dropPrice').textContent=money(pending[2]);$('claim').textContent='Забрать в инвентарь';render()},4800);
+ render();
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
