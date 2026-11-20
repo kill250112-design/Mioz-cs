@@ -8,6 +8,7 @@ let balance=1000,inventory=[],rolling=false,pending=null,battleSelection=[],batt
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
 function render(){
  $('balance').textContent=money(balance);$('count').textContent=inventory.length;
+ $('cases').setAttribute('aria-live','polite');$('inventory').setAttribute('aria-live','polite');
  $('cases').innerHTML=cases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>Открыть кейс</button></article>`).join('');
  $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>`<article class="case"><div class="art">${x.icon}</div><h3>${x.name}</h3><b class="price">${money(x.price)}</b><button data-sell="${i}">Продать</button></article>`).join(''):'<p class="muted">Инвентарь пуст — открой кейс!</p>';
  document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>openCase(b.dataset.case));
@@ -21,13 +22,14 @@ function openCase(id){
  setTimeout(()=>{rolling=false;$('result').textContent=pending[1];$('dropName').textContent=pending[0];$('dropPrice').textContent=money(pending[2]);$('claim').textContent='Забрать в инвентарь';render()},2900);render();
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
-$('close').onclick=()=>{if(!rolling)$('modal').classList.add('hidden')};
+$('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
 function renderBattle(){
  const cost=battleSelection.reduce((s,id)=>s+cases.find(c=>c.id===id).price,0);
  $('battle-count').textContent=battleSelection.length+' / 3';$('battle-cost').textContent=money(cost);
  $('battle-cases').innerHTML=cases.map(c=>{const yes=battleSelection.includes(c.id);return `<article class="case battle-case ${yes?'selected':''}"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">${c.drops.length} предметов в пуле</p><b class="price">${money(c.price)}</b><button class="choose-case" data-pick="${c.id}" ${battleRunning||(!yes&&battleSelection.length>=3)?'disabled':''}>${yes?'✓ Выбран':'＋ Добавить'}</button></article>`}).join('');
  $('battle-cases').querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const id=b.dataset.pick;battleSelection=battleSelection.includes(id)?battleSelection.filter(x=>x!==id):[...battleSelection,id];$('battle-result').classList.add('hidden');renderBattle()});
- $('start-battle').disabled=!battleSelection.length||battleRunning;
+ $('start-battle').disabled=!battleSelection.length||battleRunning||cost>balance;
+ $('start-battle').title=cost>balance?'Недостаточно средств':battleSelection.length?'Начать батл':'Сначала выбери хотя бы один кейс';
 }
 function startBattle(){
  if(battleRunning||!battleSelection.length)return;
