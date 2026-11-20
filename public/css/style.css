@@ -48,3 +48,47 @@ button:focus-visible{outline:2px solid #c7baff;outline-offset:3px}
  .grid{grid-template-columns:1fr}
  .case h3,.case .muted{min-height:0}
 }
+
+/* Visual refresh */
+:root{--bg:#0b0d17;--panel:#151827;--panel2:#1b2033;--line:#2b3047;--violet:#8b6cff;--violet2:#6847df;--text:#f5f4ff;--sub:#a6abc2;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{max-width:1080px;padding:24px 28px;background:radial-gradient(ellipse at 50% -18%,#29204c 0,transparent 42%),var(--bg);min-height:100vh}
+header{position:sticky;top:0;z-index:8;margin:0 -4px;padding:16px 4px;background:#0b0d17e8;backdrop-filter:blur(16px);border-bottom:1px solid #ffffff12}
+.logo{font-size:21px;font-weight:900;letter-spacing:2.5px}.logo span{color:#a68cff}
+header>div{padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:#ffffff08;color:var(--sub);font-size:13px}
+header strong{color:#fff;margin-left:5px}
+.hero{position:relative;overflow:hidden;padding:clamp(34px,6vw,66px);margin:28px 0 22px;border:1px solid #7960cb55;border-radius:28px;background:linear-gradient(115deg,#201b39 0%,#29204c 48%,#39276b 100%);box-shadow:0 24px 70px #0005}
+.hero:after{content:"CS2";position:absolute;right:2%;bottom:-35%;font-size:clamp(130px,25vw,270px);font-weight:1000;letter-spacing:-18px;color:#ffffff08;pointer-events:none}
+.hero small,.battle-hero small{font-size:11px;font-weight:800}
+.hero h1{position:relative;z-index:1;font-size:clamp(38px,7vw,66px);letter-spacing:-2px;line-height:.98;margin:18px 0}
+.hero p{position:relative;z-index:1;font-size:15px;color:#d2cde7;max-width:440px;line-height:1.65}
+nav{position:sticky;top:70px;z-index:7;display:flex;gap:8px;padding:8px;margin:22px 0 24px;border:1px solid var(--line);border-radius:17px;background:#111524eF;backdrop-filter:blur(14px)}
+nav button{flex:1;min-height:48px;border:1px solid transparent;background:transparent;color:#aeb2c8;font-size:14px}
+nav button.active{background:linear-gradient(135deg,#8b6cff,#6746d5);color:white;box-shadow:0 7px 22px #7654ed55}
+nav button:hover:not(.active){background:#ffffff0c;color:#fff}
+.grid{gap:18px}
+.case{position:relative;overflow:hidden;padding:18px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(155deg,#1b2032,#121624);box-shadow:0 12px 32px #0002;transition:transform .2s,border-color .2s,box-shadow .2s}
+.case:hover{transform:translateY(-4px);border-color:#8064e8;box-shadow:0 18px 40px #0005}
+.art{height:150px;flex-basis:150px;border:1px solid #ffffff0a;border-radius:17px;background:radial-gradient(circle at 50% 25%,#514078,#29243e 54%,#1b2030);font-size:76px}
+.case h3{font-size:17px;letter-spacing:-.25px;margin:13px 0 7px}
+.case .muted{color:var(--sub);font-size:13px}
+.price{color:#d4c4ff;font-size:17px;font-weight:850}
+.case button,.dialog button#claim,.battle-footer button{border-radius:13px;background:linear-gradient(135deg,#8b6cff,#6443d0);box-shadow:0 8px 20px #6746d533}
+.case button:hover:not(:disabled),.dialog button#claim:hover,.battle-footer button:hover:not(:disabled){background:linear-gradient(135deg,#a18aff,#7654e8)}
+.case button:disabled,.battle-footer button:disabled{box-shadow:none}
+.battle-hero{padding:clamp(24px,5vw,42px);border-radius:26px;background:radial-gradient(circle at 90% 0%,#704ac8 0,#38275e 34%,#171a2b 78%);box-shadow:0 20px 55px #0005}
+.battle-hero h2{font-size:clamp(32px,6vw,48px);letter-spacing:-1.4px}
+.battle-head{margin:26px 0 16px}
+.battle-head h3{font-size:21px}
+.battle-footer{border-color:#6952a7;background:#111423f2;box-shadow:0 12px 38px #0009}
+.battle-result{border-color:#57447f;background:linear-gradient(145deg,#20213a,#131725);box-shadow:0 18px 50px #0004}
+.battle-versus strong{font-size:18px}
+.round-list article{border:1px solid #ffffff0d;background:#ffffff06}
+.modal{z-index:20;background:#050610d9;backdrop-filter:blur(10px)}
+.dialog{border:1px solid #6752a1;border-radius:26px;background:linear-gradient(150deg,#25233d,#151827);box-shadow:0 28px 90px #000b}
+.dialog h2{font-size:22px;line-height:1.3}
+.dialog #dropPrice{display:block;color:#d4c4ff;font-size:20px;margin-top:8px}
+.close{background:#ffffff12!important;box-shadow:none!important}
+footer{color:#777f9d;border-top:1px solid #ffffff0c;margin-top:40px;line-height:1.6}
+.hidden{display:none!important}
+@media(min-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}#cases.grid,#inventory.grid,#battle-cases.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){body{padding:12px}.hero{margin-top:18px;border-radius:22px}.hero h1{letter-spacing:-1.2px}nav{top:65px;margin:16px 0;padding:6px}.grid{gap:10px}.case{border-radius:18px;padding:13px}.art{height:112px;flex-basis:112px;font-size:60px}.case h3{font-size:15px}.battle-hero{border-radius:22px}.battle-footer{border-radius:15px}}
