@@ -174,7 +174,3 @@ footer{padding-bottom:25px}
 
 /* Ensure the hero call-to-action stays above decorative layers and receives taps */
 .hero-copy{position:relative;z-index:6;pointer-events:auto}.hero-battle-button{position:relative;z-index:7;pointer-events:auto;touch-action:manipulation;cursor:pointer}
-
-
-/* Remove oversized decorative hero lettering */
-.hero:after{display:none!important}
