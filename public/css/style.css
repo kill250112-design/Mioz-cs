@@ -171,3 +171,6 @@ footer{padding-bottom:25px}
 .hero-battle-button,.back-cases{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding:12px 20px;border:1px solid rgba(145,125,255,.55);border-radius:12px;background:linear-gradient(135deg,#7657ff,#4933b9);color:#fff;font-weight:700;}
 .back-cases{margin:0 0 14px;background:rgba(255,255,255,.08);}
 .hero-battle-button:active,.back-cases:active{transform:scale(.98)}
+
+/* Ensure the hero call-to-action stays above decorative layers and receives taps */
+.hero-copy{position:relative;z-index:6;pointer-events:auto}.hero-battle-button{position:relative;z-index:7;pointer-events:auto;touch-action:manipulation;cursor:pointer}
