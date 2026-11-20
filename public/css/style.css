@@ -235,3 +235,16 @@ body{background-image:none!important}
 .filter-row .filter.active{background:#55418f!important;color:#fff!important}
 .balance-pill{background:#15161b!important;color:#f5f5f7!important;border-color:#303139!important}
 footer{color:#777985!important}
+
+
+/* Full navigation on the black theme */
+.bottom-nav{position:fixed!important;left:50%!important;bottom:max(10px,env(safe-area-inset-bottom))!important;top:auto!important;transform:translateX(-50%)!important;z-index:15!important;width:min(520px,calc(100% - 24px))!important;display:flex!important;gap:6px!important;padding:7px!important;margin:0!important;border:1px solid #343540!important;border-radius:20px!important;background:#14151bf2!important;backdrop-filter:blur(16px)}
+.bottom-nav button{flex:1!important;min-width:0!important;min-height:52px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;padding:6px 8px!important;background:transparent!important;color:#aeb0bb!important;font-size:11px!important;border-radius:14px!important}
+.bottom-nav button span{font-size:19px!important;line-height:1}
+.bottom-nav button.active{background:#57448e!important;color:#fff!important}
+body{padding-bottom:100px!important}
+.hero:after{content:none!important}
+/* Roulette animation polish */
+#result .spin-track{transition:transform 4.65s cubic-bezier(.08,.72,.08,1)!important}
+#result .spin-track span{flex:0 0 82px!important}
+#result .roulette-marker{pointer-events:none}
