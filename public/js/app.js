@@ -47,7 +47,7 @@ function startBattle(){
 }
 $('start-battle').onclick=startBattle;
 function showTab(tab){
- document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
+ document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));\n document.querySelectorAll('.section-switch [data-view]').forEach(x=>x.classList.toggle('switch-active',x.dataset.view===tab));
  ['cases','inventory','battle'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
  $('filter-row').classList.toggle('hidden',tab!=='cases');
  document.querySelector('.section-switch').classList.toggle('hidden',tab==='battle');
