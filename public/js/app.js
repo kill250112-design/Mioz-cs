@@ -11,7 +11,8 @@ function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({bal
 function render(){
  saveGame();$('balance').textContent=money(balance);$('count').textContent=inventory.length;
  $('cases').setAttribute('aria-live','polite');$('inventory').setAttribute('aria-live','polite');
- const visibleCases=cases.filter(c=>activeFilter==='all'||(activeFilter==='knife'?c.id==='knife':c.id!=='knife'));\n $('cases').innerHTML=visibleCases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>Открыть кейс</button></article>`).join('');
+ const visibleCases=cases.filter(c=>activeFilter==='all'||(activeFilter==='knife'?c.id==='knife':c.id!=='knife'));
+ $('cases').innerHTML=visibleCases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>Открыть кейс</button></article>`).join('');
  $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>`<article class="case"><div class="art">${x.icon}</div><h3>${x.name}</h3><b class="price">${money(x.price)}</b><button data-sell="${i}">Продать</button></article>`).join(''):'<p class="muted">Инвентарь пуст — открой кейс!</p>';
  document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>openCase(b.dataset.case));
  document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
@@ -47,15 +48,13 @@ function startBattle(){
 }
 $('start-battle').onclick=startBattle;
 function showTab(tab){
- document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));\n document.querySelectorAll('.section-switch [data-view]').forEach(x=>x.classList.toggle('switch-active',x.dataset.view===tab));
+ document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
  ['cases','inventory','battle'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
  $('filter-row').classList.toggle('hidden',tab!=='cases');
- document.querySelector('.section-switch').classList.toggle('hidden',tab==='battle');
  if(tab==='battle')renderBattle();
  if(tab==='cases'||tab==='inventory')render();
 }
 document.querySelectorAll('.bottom-nav [data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>showTab(b.dataset.view));
 document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
  activeFilter=b.dataset.filter;
  document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));
