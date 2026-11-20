@@ -1,9 +1,9 @@
-/* Fixed black CS2 screen with title at the very top */
-html,body{height:100%;margin:0;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important}
-body{position:fixed;width:100%;inset:0}
-#cs2-splash{position:fixed;inset:0;z-index:99999;background:#000!important;display:grid;place-items:start center;opacity:1;visibility:visible;color:#fff;font-family:Arial,Helvetica,sans-serif;overflow:hidden;overscroll-behavior:none;touch-action:none}
+/* Locked viewport; CS2 label pinned to the top edge */
+html,body{width:100%!important;height:100%!important;min-height:100%!important;margin:0!important;padding:0!important;overflow:hidden!important;overscroll-behavior:none!important;position:fixed!important;inset:0!important;touch-action:pan-x!important}
+body{max-height:100dvh!important}
+#cs2-splash{position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:0!important;z-index:2147483647!important;background:#000!important;display:block!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:pan-x!important;opacity:1!important;visibility:visible!important;color:#fff;font-family:Arial,Helvetica,sans-serif}
 #cs2-splash::before,#cs2-splash::after{display:none!important}
-#cs2-splash .cs2-splash-inner{display:block!important;text-align:center;padding:8px 24px 24px}
-#cs2-splash .cs2-splash-mark{display:block!important;color:#fff!important;background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important;font-size:clamp(52px,14vw,100px);font-weight:900;letter-spacing:.04em;line-height:1;text-shadow:0 0 22px rgba(255,255,255,.16);filter:none!important}
+#cs2-splash .cs2-splash-inner{position:absolute!important;top:0!important;left:0!important;right:0!important;display:block!important;text-align:center!important;margin:0!important;padding:0!important}
+#cs2-splash .cs2-splash-mark{display:block!important;margin:0!important;padding:0!important;color:#fff!important;background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important;font-size:clamp(52px,14vw,100px)!important;font-weight:900!important;letter-spacing:.04em!important;line-height:1!important;text-shadow:0 0 22px rgba(255,255,255,.16)!important;filter:none!important}
 #cs2-splash .cs2-splash-sub,#cs2-splash .cs2-splash-play,#cs2-splash .cs2-splash-foot{display:none!important}
-#cs2-splash.cs2-splash-hidden{opacity:0;visibility:hidden;pointer-events:none}
+#cs2-splash.cs2-splash-hidden{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
