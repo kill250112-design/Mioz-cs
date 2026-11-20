@@ -60,5 +60,4 @@ document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));
  render();
 });
-$('promo-battle').onclick=()=>showTab('battle');
 render();
