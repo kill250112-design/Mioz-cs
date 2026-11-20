@@ -21,9 +21,32 @@ function openCase(id){
  $('result').innerHTML='<div class="spin-track">'+Array.from({length:15},(_,i)=>'<span>'+c.drops[i%c.drops.length][1]+'</span>').join('')+'</div>';
  const track=$('result').firstElementChild;track.style.animation='roulette 2.8s cubic-bezier(.08,.72,.12,1) forwards';
  setTimeout(()=>{rolling=false;$('result').textContent=pending[1];$('dropName').textContent=pending[0];$('dropPrice').textContent=money(pending[2]);$('claim').textContent='Забрать в инвентарь';render()},2900);
- render();
+ 
+let battleSelection=[],battleRunning=false;
+function renderBattle(){
+ const cost=battleSelection.reduce((s,id)=>s+cases.find(c=>c.id===id).price,0);
+ $('battle-count').textContent=battleSelection.length+' / 3';$('battle-cost').textContent=money(cost);
+ $('battle-cases').innerHTML=cases.map(c=>{const yes=battleSelection.includes(c.id);return `<article class="case battle-case ${yes?'selected':''}"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">${c.drops.length} предметов в пуле</p><b class="price">${money(c.price)}</b><button class="choose-case" data-pick="${c.id}" ${battleRunning||(!yes&&battleSelection.length>=3)?'disabled':''}>${yes?'✓ Выбран':'＋ Добавить'}</button></article>`}).join('');
+ $('battle-cases').querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const id=b.dataset.pick;battleSelection=battleSelection.includes(id)?battleSelection.filter(x=>x!==id):[...battleSelection,id];$('battle-result').classList.add('hidden');renderBattle()});
+ $('start-battle').disabled=!battleSelection.length||battleRunning;
+}
+function startBattle(){
+ if(battleRunning||!battleSelection.length)return;
+ const cost=battleSelection.reduce((s,id)=>s+cases.find(c=>c.id===id).price,0);
+ if(balance<cost){$('battle-result').classList.remove('hidden');$('battle-result').innerHTML='<h3>Не хватает баланса</h3><p>Продай предметы из инвентаря или открой обычные кейсы.</p>';return}
+ balance-=cost;battleRunning=true;render();
+ const rounds=battleSelection.map(id=>{const c=cases.find(x=>x.id===id);return {c,p:c.drops[Math.floor(Math.random()*c.drops.length)],b:c.drops[Math.floor(Math.random()*c.drops.length)]}});
+ const p=rounds.reduce((s,r)=>s+r.p[2],0),b=rounds.reduce((s,r)=>s+r.b[2],0);
+ $('battle-result').classList.remove('hidden');
+ $('battle-result').innerHTML='<div class="battle-versus"><div><span>🧑</span><b>ТЫ</b><strong>'+money(p)+'</strong></div><em>VS</em><div><span>🤖</span><b>БОТ</b><strong>'+money(b)+'</strong></div></div><div class="round-list">'+rounds.map((r,i)=>'<article><small>РАУНД '+(i+1)+' · '+r.c.name+'</small><div class="round-players"><span>Ты: '+r.p[1]+' '+r.p[0]+' <b>'+money(r.p[2])+'</b></span><span>Бот: '+r.b[1]+' '+r.b[0]+' <b>'+money(r.b[2])+'</b></span></div></article>').join('')+'</div><h2 class="battle-winner">'+(p>b?'🏆 Ты победил!':p<b?'🤖 Победил бот':'🤝 Ничья!')+'</h2><p class="muted">'+(p>b?'Дропы батла отправлены в твой инвентарь.':'Попробуй ещё раз — удача может улыбнуться!')+'</p><button id="again-battle">Сыграть ещё раз</button>';
+ if(p>b)rounds.forEach(r=>inventory.push({name:r.p[0],icon:r.p[1],price:r.p[2]}));
+ battleRunning=false;$('again-battle').onclick=()=>{$('battle-result').classList.add('hidden');renderBattle()};render();
+}
+$('start-battle').onclick=startBattle;
+
+render();
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(!rolling)$('modal').classList.add('hidden')};
-document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));$('cases').classList.toggle('hidden',b.dataset.tab!=='cases');$('inventory').classList.toggle('hidden',b.dataset.tab!=='inventory')});
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['cases','inventory','battle'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='battle')renderBattle()});
 render();
