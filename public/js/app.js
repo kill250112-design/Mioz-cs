@@ -46,8 +46,7 @@ function startBattle(){
  if(p>b)rounds.forEach(r=>inventory.push({name:r.p[0],icon:r.p[1],price:r.p[2]}));
  battleRunning=false;$('again-battle').onclick=()=>{$('battle-result').classList.add('hidden');renderBattle()};render();
 }
-$('start-battle').onclick=startBattle;\n$('hero-battle').onclick=()=>showTab('battle');\n$('back-cases').onclick=()=>showTab('cases');
-function showTab(tab){
+$('start-battle').onclick=startBattle;\n$('hero-battle').onclick=()=>showTab('battle');\nfunction showTab(tab){
  document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
  ['cases','inventory','battle'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
  $('filter-row').classList.toggle('hidden',tab!=='cases');
