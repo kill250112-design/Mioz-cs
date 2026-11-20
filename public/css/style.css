@@ -223,3 +223,15 @@ footer{color:#777985;border-color:#24252b}
 button{background:#25262e}
 button.active,button:hover{background:#59458f}
 .case button,.dialog button#claim,.battle-footer button{background:linear-gradient(135deg,#7056b5,#4c397f);box-shadow:none}
+
+/* Force the original black theme */
+html,body{background:#08090d!important;color:#f5f5f7!important}
+body{background-image:none!important}
+.topbar,header{background:#08090d!important}
+.hero,.battle-hero{background:linear-gradient(135deg,#17181d,#0d0e12 70%)!important;color:#f5f5f7!important;border:1px solid #292a31!important}
+.case,.dialog,.battle-result{background:#15161b!important;color:#f5f5f7!important;border-color:#303139!important}
+.art{background:linear-gradient(145deg,#24252d,#111217)!important}
+.filter-row .filter{background:#17181e!important;color:#c5c5ce!important;border-color:#33343d!important}
+.filter-row .filter.active{background:#55418f!important;color:#fff!important}
+.balance-pill{background:#15161b!important;color:#f5f5f7!important;border-color:#303139!important}
+footer{color:#777985!important}
