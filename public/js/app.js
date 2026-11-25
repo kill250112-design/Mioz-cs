@@ -5,14 +5,21 @@ const CASE_PRICES_USD={
 };
 const USD_RUB=80;
 const rarityWeight=r=>({'Mil-Spec Grade':79.92,'Restricted':15.98,'Classified':3.2,'Covert':0.64}[r]||0.26);
+// Ориентировочные цены предметов в рублях: целые числа, одинаковые для одного и того же скина.
+function itemMarketPrice(name,rarity){
+ const ranges={'Mil-Spec Grade':[15,180],'Restricted':[70,650],'Classified':[250,2200],'Covert':[900,9000],'Special':[2500,30000]};
+ const [min,max]=ranges[rarity]||ranges.Special;
+ let hash=0;for(let i=0;i<name.length;i++)hash=(hash*31+name.charCodeAt(i))>>>0;
+ return Math.round((min+(hash%10000)/9999*(max-min))/1)*1;
+}
 async function loadCases(){
  try{
   const response=await fetch(CASE_API);if(!response.ok)throw new Error('API');
   const data=await response.json();
   const wantedCases=['Dreams & Nightmares Case','Revolution Case','Kilowatt Case','Gallery Case','Fever Case'];
   cases=data.filter(c=>c.type==='Case'&&wantedCases.includes(c.name)&&Array.isArray(c.contains)&&c.contains.length).map((c,i)=>{
-   const regular=c.contains.map(x=>[x.name,'',0,rarityWeight(x.rarity?.name),x.image,x.rarity?.color]);
-   const rare=(c.contains_rare||[]).map(x=>[x.name,'',0,0.26,x.image,'#e4ae39']);
+   const regular=c.contains.map(x=>[x.name,'',itemMarketPrice(x.name,x.rarity?.name),rarityWeight(x.rarity?.name),x.image,x.rarity?.color]);
+   const rare=(c.contains_rare||[]).map(x=>[x.name,'',itemMarketPrice(x.name,'Special'),0.26,x.image,'#e4ae39']);
    const drops=[...regular,...rare];
    const total=drops.reduce((s,d)=>s+d[3],0);drops.forEach(d=>d[3]=d[3]/total*100);
    const usd=CASE_PRICES_USD[c.name];
