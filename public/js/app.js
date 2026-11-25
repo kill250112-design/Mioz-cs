@@ -4,7 +4,7 @@ const cases=[
 {id:'legend',name:'Легендарный кейс',price:700,icon:'🔥',drops:[['Glock-18 | Water Elemental','💧',900],['AK-47 | Fire Serpent','🐍',18000],['AWP | Hyper Beast','🦖',8500],['Karambit | Crimson Web','🕸️',32000]]},
 {id:'knife',name:'Ножевой кейс',price:1200,icon:'🔪',drops:[['Bayonet | Forest','🌳',6500],['Butterfly Knife | Waves','🦋',18000],['Karambit | Fade','🔪',24000],['Karambit | Ruby','💎',52000]]}
 ];
-let balance=1000,inventory=[],rolling=false,pending=null,activeFilter='all';
+let balance=1000,inventory=[],rolling=false,pending=null;
 try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)&&Array.isArray(saved.inventory)){balance=Math.max(0,saved.balance);inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)&&typeof x.icon==='string')}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
@@ -13,7 +13,7 @@ function render(){
  const count=$('home-inventory-count');if(count)count.textContent=inventory.length;
  const recent=$('recent-drop');if(recent)recent.textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет дропов';
  $('cases').setAttribute('aria-live','polite');$('inventory').setAttribute('aria-live','polite');
- const visibleCases=cases.filter(c=>activeFilter==='all'||(activeFilter==='knife'?c.id==='knife':c.id!=='knife'));
+ const visibleCases=cases;
  $('cases').innerHTML=visibleCases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>Открыть кейс</button></article>`).join('');
  $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>`<article class="case"><div class="art">${x.icon}</div><h3>${x.name}</h3><b class="price">${money(x.price)}</b><button data-sell="${i}">Продать</button></article>`).join(''):'<p class="muted">Инвентарь пуст — открой кейс!</p>';
  document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>openCase(b.dataset.case));
@@ -41,15 +41,10 @@ $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pendi
  document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
  ['cases','inventory'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
  $('home-dashboard').classList.toggle('hidden',tab!=='cases');
- $('filter-row').classList.toggle('hidden',tab!=='cases');
  if(tab==='cases'||tab==='inventory')render();
 }
 document.querySelectorAll('.bottom-nav [data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
-document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
- activeFilter=b.dataset.filter;
- document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));
- render();
-});
+$('logo-home')?.addEventListener('click',()=>showTab('cases'));
 render();
 $('home-inventory').onclick=()=>showTab('inventory');
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
