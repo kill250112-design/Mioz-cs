@@ -327,3 +327,6 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 .battle-reel-track>span{width:76px;height:74px;flex:0 0 76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid #3c3d49;border-radius:9px;background:linear-gradient(145deg,#252637,#151620);font-size:27px}
 .battle-reel-track>span small{max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;color:#c3c3cf}
 @media(prefers-reduced-motion:reduce){.battle-reel-track{transition-duration:.01ms}}
+
+/* Hide obsolete category chips (Все / Оружие / Ножи) everywhere */
+.filter-row,.filter-row *,[data-filter]{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important}
