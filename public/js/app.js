@@ -25,6 +25,7 @@ function render(){
 function openCase(id){
  if(rolling)return;const c=cases.find(x=>x.id===id);if(!c)return;if(balance<c.price){alert('Недостаточно монет для открытия кейса. Пополни баланс.');return;}
  balance-=c.price;rolling=true;pending=chooseDrop(c);
+ saveGame();$('balance').textContent=money(balance);
  $('modal').classList.remove('hidden');$('dropName').textContent='Крутим кейс...';$('dropPrice').textContent='';$('claim').textContent='Ожидай...';$('claim').disabled=true;
  const targetIndex=24,total=30;
  const items=Array.from({length:total},(_,i)=>i===targetIndex?pending:chooseDrop(c));
