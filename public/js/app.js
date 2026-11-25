@@ -22,6 +22,8 @@ async function loadCases(){
    const rare=(c.contains_rare||[]).map(x=>[x.name,'',itemMarketPrice(x.name,'Special'),0.26,x.image,'#e4ae39']);
    const drops=[...regular,...rare];
    const total=drops.reduce((s,d)=>s+d[3],0);drops.forEach(d=>d[3]=d[3]/total*100);
+   // В списке кейса дорогие скины сверху, дешёвые снизу.
+   drops.sort((a,b)=>b[2]-a[2]);
    const usd=CASE_PRICES_USD[c.name];
    return {id:'case-'+c.id,name:c.name,price:Math.round((usd||0.5)*USD_RUB),icon:'',image:c.image,drops};
   });
