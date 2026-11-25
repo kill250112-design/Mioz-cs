@@ -38,7 +38,13 @@ function openCase(id){
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
 
+function showTab(tab){
  document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
+ ['cases','inventory'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
+ $('home-dashboard').classList.toggle('hidden',tab!=='cases');
+ if(tab==='cases'||tab==='inventory')render();
+}
+
  ['cases','inventory'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
  $('home-dashboard').classList.toggle('hidden',tab!=='cases');
  if(tab==='cases'||tab==='inventory')render();
