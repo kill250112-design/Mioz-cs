@@ -15,7 +15,7 @@ function render(){
  const recent=$('recent-drop');if(recent)recent.textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет дропов';
  $('cases').setAttribute('aria-live','polite');$('inventory').setAttribute('aria-live','polite');
  const selected=cases.find(c=>c.id===expandedCase);
- $('cases').innerHTML=selected?`<section class="case-detail"><button class="detail-back" data-back>← Все кейсы</button><div class="detail-art">${selected.icon}</div><h2>${selected.name}</h2><p class="muted">Стоимость открытия: ${money(selected.price)}</p><button class="open detail-open" data-open="${selected.id}" ${balance<selected.price?'disabled':''}>Открыть · ${money(selected.price)}</button><h3 class="odds-title">Содержимое кейса и шансы</h3><div class="case-contents"><div class="contents-list">${selected.drops.map(d=>`<div class="contents-row"><span>${d[1]} ${d[0]}</span><b>${d[3]}%</b><small>Цена: ${money(d[2])}</small></div>`).join('')}</div></div></section>`:cases.map(c=>`<article class="case case-tile" data-case="${c.id}"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}">Посмотреть кейс</button></article>`).join('');
+ $('cases').innerHTML=selected?`<section class="case-detail"><button class="detail-back" data-back>← Все кейсы</button><div class="detail-art">${selected.icon}</div><h2>${selected.name}</h2><p class="muted">Стоимость открытия: ${money(selected.price)}</p><button type="button" class="open detail-open" data-open="${selected.id}">Открыть · ${money(selected.price)}</button><h3 class="odds-title">Содержимое кейса и шансы</h3><div class="case-contents"><div class="contents-list">${selected.drops.map(d=>`<div class="contents-row"><span>${d[1]} ${d[0]}</span><b>${d[3]}%</b><small>Цена: ${money(d[2])}</small></div>`).join('')}</div></div></section>`:cases.map(c=>`<article class="case case-tile" data-case="${c.id}"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}">Посмотреть кейс</button></article>`).join('');
  $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>`<article class="case"><div class="art">${x.icon}</div><h3>${x.name}</h3><b class="price">${money(x.price)}</b><button data-sell="${i}">Продать</button></article>`).join(''):'<p class="muted">Инвентарь пуст — открой кейс!</p>';
  document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>{expandedCase=b.dataset.case;render()});
  document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openCase(b.dataset.open));
@@ -23,7 +23,7 @@ function render(){
  document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
 }
 function openCase(id){
- if(rolling)return;const c=cases.find(x=>x.id===id);if(!c||balance<c.price)return;
+ if(rolling)return;const c=cases.find(x=>x.id===id);if(!c)return;if(balance<c.price){alert('Недостаточно монет для открытия кейса. Пополни баланс.');return;}
  balance-=c.price;rolling=true;pending=chooseDrop(c);
  $('modal').classList.remove('hidden');$('dropName').textContent='Крутим кейс...';$('dropPrice').textContent='';$('claim').textContent='Ожидай...';$('claim').disabled=true;
  const targetIndex=24,total=30;
