@@ -12,7 +12,6 @@ function render(){
  saveGame();$('balance').textContent=money(balance);
  const count=$('home-inventory-count');if(count)count.textContent=inventory.length;
  const recent=$('recent-drop');if(recent)recent.textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет дропов';
- updateWheelStatus();
  $('cases').setAttribute('aria-live','polite');$('inventory').setAttribute('aria-live','polite');
  const visibleCases=cases.filter(c=>activeFilter==='all'||(activeFilter==='knife'?c.id==='knife':c.id!=='knife'));
  $('cases').innerHTML=visibleCases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>Открыть кейс</button></article>`).join('');
@@ -52,13 +51,6 @@ document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
  render();
 });
 render();
-/* Home dashboard shortcuts and 12-hour bonus wheel */
-function updateWheelStatus(){
- const last=Number(localStorage.getItem('cs2-wheel-last')||0),left=12*60*60*1000-(Date.now()-last);
- const status=$('wheel-status');if(!status)return;
- if(left<=0){status.textContent='Крутить колесо →';$('home-wheel').disabled=false}
- else{const h=Math.floor(left/3600000),m=Math.ceil((left%3600000)/60000);status.textContent='Следующее вращение через '+h+' ч '+m+' мин';$('home-wheel').disabled=true}
-}
 $('home-inventory').onclick=()=>showTab('inventory');
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 $('home-wheel').onclick=()=>{
