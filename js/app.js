@@ -19,7 +19,6 @@ async function loadCases(){
   });
   cases.sort((a,b)=>a.name.localeCompare(b.name));
   render();
-loadCases();
  }catch(e){console.error('Не удалось загрузить каталог кейсов CS2',e)}
 }
 
@@ -28,7 +27,7 @@ try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(sav
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
 function skinImage(name){const wear=name.includes('Karambit')||name.includes('Bayonet')||name.includes('Butterfly Knife')?'Factory New':'Field-Tested';return 'https://cdn2.csgo.com/item/'+encodeURIComponent(name+' ('+wear+')')+'/512.png'}
-function itemVisual(d,cls='skin-image'){return '<img class="'+cls+'" src="'+skinImage(d[0])+'" alt="'+d[0]+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+d[1]+'</span>'}
+function itemVisual(d,cls='skin-image'){return '<img class="'+cls+'" src="'+(d[4]||skinImage(d[0]))+'" alt="'+d[0]+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+d[1]+'</span>'}
 function chooseDrop(c){let roll=Math.random()*100;for(const d of c.drops){roll-=d[3];if(roll<0)return d}return c.drops[c.drops.length-1]}
 function render(){
  saveGame();$('balance').textContent=money(balance);
@@ -74,3 +73,5 @@ $('logo-home')?.addEventListener('click',()=>showTab('cases'));
 $('home-inventory').onclick=()=>showTab('inventory');
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 render();
+
+loadCases();
