@@ -343,3 +343,21 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 .contents-row small{grid-column:1/-1;color:#9295a5;font-size:10px}
 .bottom-nav{width:min(520px,calc(100% - 24px))!important}
 @media(max-width:520px){.contents-row{font-size:9px}.case-contents summary{font-size:10px}}
+
+
+/* Full-screen case details */
+.case-detail{min-height:calc(100dvh - 190px);width:100%;padding:18px 16px 30px;border:1px solid #39334f;border-radius:22px;background:radial-gradient(ellipse at 50% 0%,#302653 0,#171827 48%,#11131e 100%);display:flex;flex-direction:column;align-items:stretch}
+.detail-back{align-self:flex-start;background:#292b40;margin-bottom:14px}
+.detail-art{height:clamp(150px,27vh,240px);display:grid;place-items:center;font-size:clamp(90px,22vw,150px);border-radius:18px;background:linear-gradient(145deg,#3a315e,#1b2033);border:1px solid #51417f}
+.case-detail h2{text-align:center;font-size:clamp(24px,6vw,34px);margin:18px 0 5px}
+.case-detail>.muted{text-align:center;margin:0 0 12px}
+.detail-open{min-height:56px;font-size:18px;margin:8px 0 20px;flex:0 0 auto;background:linear-gradient(110deg,#9877ff,#6744df)}
+.odds-title{font-size:18px;margin:0 0 10px}
+.case-detail .case-contents{margin:0;flex:1}
+.case-detail .contents-list{padding:4px 14px 10px}
+.case-detail .contents-row{grid-template-columns:minmax(0,1fr) auto;gap:5px 12px;padding:13px 0;font-size:13px}
+.case-detail .contents-row b{font-size:14px}
+.case-detail .contents-row small{font-size:11px}
+.case-tile{cursor:pointer}
+.case-tile .open{margin-top:auto}
+@media(max-width:520px){.case-detail{min-height:calc(100dvh - 165px);padding:14px 12px 22px}.case-detail .contents-row{font-size:12px}}
