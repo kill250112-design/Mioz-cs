@@ -4,7 +4,7 @@ const cases=[
 {id:'legend',name:'Легендарный кейс',price:700,icon:'🔥',drops:[['Glock-18 | Water Elemental','💧',900],['AK-47 | Fire Serpent','🐍',18000],['AWP | Hyper Beast','🦖',8500],['Karambit | Crimson Web','🕸️',32000]]},
 {id:'knife',name:'Ножевой кейс',price:1200,icon:'🔪',drops:[['Bayonet | Forest','🌳',6500],['Butterfly Knife | Waves','🦋',18000],['Karambit | Fade','🔪',24000],['Karambit | Ruby','💎',52000]]}
 ];
-let balance=1000,inventory=[],rolling=false,pending=null,battleSelection=[],battleRunning=false,activeFilter='all';
+let balance=1000,inventory=[],rolling=false,pending=null,activeFilter='all';
 try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)&&Array.isArray(saved.inventory)){balance=Math.max(0,saved.balance);inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)&&typeof x.icon==='string')}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
@@ -38,70 +38,11 @@ function openCase(id){
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
-function dropChances(c){
- const weights=c.drops.map(d=>1/Math.sqrt(d[2]));
- const total=weights.reduce((s,x)=>s+x,0);
- return c.drops.map((d,i)=>({drop:d,chance:weights[i]/total*100})).sort((x,y)=>y.chance-x.chance);
-}
-function weightedDrop(c){
- const chances=dropChances(c);let roll=Math.random()*100;
- for(const item of chances){roll-=item.chance;if(roll<=0)return item.drop}
- return chances[chances.length-1].drop;
-}
-function renderBattle(){
- const cost=battleSelection.reduce((s,id)=>s+cases.find(c=>c.id===id).price,0);
- $('battle-count').textContent=battleSelection.length+' / 3';$('battle-cost').textContent=money(cost);
- $('battle-cases').innerHTML=cases.map(c=>{
-  const yes=battleSelection.includes(c.id);
-  const odds=dropChances(c).map(x=>'<div class="odds-row"><span>'+x.drop[1]+' '+x.drop[0]+'</span><b>'+x.chance.toFixed(1).replace('.',',')+'%</b></div>').join('');
-  return `<article class="case battle-case ${yes?'selected':''}"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">${c.drops.length} предметов · шанс зависит от стоимости скина</p><b class="price">${money(c.price)}</b><details class="battle-odds"><summary>Показать шансы выпадения</summary><div class="odds-list">${odds}</div></details><button class="choose-case" data-pick="${c.id}" ${battleRunning||(!yes&&battleSelection.length>=3)?'disabled':''}>${yes?'✓ Выбран':'Открыть'}</button></article>`;
- }).join('');
- $('battle-cases').querySelectorAll('[data-pick]').forEach(btn=>btn.onclick=()=>{
-  const id=btn.dataset.pick;
-  if(battleSelection.includes(id))battleSelection=battleSelection.filter(x=>x!==id);
-  else if(battleSelection.length<3)battleSelection.push(id);
-  $('battle-result').classList.add('hidden');renderBattle();
- });
- $('start-battle').disabled=!battleSelection.length||battleRunning||cost>balance;
- $('start-battle').title=cost>balance?'Недостаточно средств':battleSelection.length?'Начать батл':'Сначала выбери хотя бы один кейс';
-}
-function battleSpinMarkup(rounds){
- return '<div class="battle-spins">'+rounds.map((r,i)=>{
-  const makeTrack=(chosen)=>{const list=Array.from({length:25},(_,n)=>n===20?chosen:weightedDrop(r.c));return '<div class="battle-spin"><small>'+ (chosen===r.p?'ТВОЙ ДРОП':'ДРОП БОТА')+'</small><div class="battle-reel"><i></i><div class="battle-reel-track">'+list.map(x=>'<span>'+x[1]+'<small>'+x[0]+'</small></span>').join('')+'</div></div></div>'};
-  return '<section class="battle-spin-round"><b>РАУНД '+(i+1)+' · '+r.c.name+'</b>'+makeTrack(r.p)+makeTrack(r.b)+'</section>';
- }).join('')+'</div>';
-}
-function animateBattleSpins(){
- document.querySelectorAll('.battle-reel-track').forEach(track=>{
-  const target=track.children[20],step=target.offsetLeft+target.offsetWidth/2;
-  const reel=track.parentElement;
-  track.style.transform='translateX('+(reel.clientWidth/2-step)+'px)';
- });
-}
-function startBattle(){
- if(battleRunning||!battleSelection.length)return;
- const cost=battleSelection.reduce((s,id)=>s+cases.find(c=>c.id===id).price,0);
- if(balance<cost){$('battle-result').classList.remove('hidden');$('battle-result').innerHTML='<h3>Не хватает баланса</h3><p>Продай предметы из инвентаря или открой обычные кейсы.</p>';return}
- balance-=cost;battleRunning=true;render();
- const rounds=battleSelection.map(id=>{const c=cases.find(x=>x.id===id);return {c,p:weightedDrop(c),b:weightedDrop(c)}});
- const p=rounds.reduce((s,r)=>s+r.p[2],0),bot=rounds.reduce((s,r)=>s+r.b[2],0);
- $('battle-result').classList.remove('hidden');
- $('battle-result').innerHTML='<h3>🎰 Батл начался! Крутим рулетки…</h3>'+battleSpinMarkup(rounds);
- requestAnimationFrame(()=>requestAnimationFrame(animateBattleSpins));
- setTimeout(()=>{
-  $('battle-result').innerHTML='<div class="battle-versus"><div><span>🧑</span><b>ТЫ</b><strong>'+money(p)+'</strong></div><em>VS</em><div><span>🤖</span><b>БОТ</b><strong>'+money(bot)+'</strong></div></div><div class="round-list">'+rounds.map((r,i)=>'<article><small>РАУНД '+(i+1)+' · '+r.c.name+'</small><div class="round-players"><span>Ты: '+r.p[1]+' '+r.p[0]+' <b>'+money(r.p[2])+'</b></span><span>Бот: '+r.b[1]+' '+r.b[0]+' <b>'+money(r.b[2])+'</b></span></div></article>').join('')+'</div><h2 class="battle-winner">'+(p>bot?'🏆 Ты победил!':p<bot?'🤖 Победил бот':'🤝 Ничья!')+'</h2><p class="muted">'+(p>bot?'Дропы батла отправлены в твой инвентарь.':'Попробуй ещё раз — удача может улыбнуться!')+'</p><button id="again-battle">Сыграть ещё раз</button>';
-  if(p>bot)rounds.forEach(r=>inventory.push({name:r.p[0],icon:r.p[1],price:r.p[2]}));
-  battleRunning=false;$('again-battle').onclick=()=>{$('battle-result').classList.add('hidden');renderBattle()};render();
- },5100);
-}
-$('start-battle').onclick=startBattle;
-$('back-cases').onclick=()=>showTab('cases');
-function showTab(tab){
+
  document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
- ['cases','inventory','battle'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
+ ['cases','inventory'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
  $('home-dashboard').classList.toggle('hidden',tab!=='cases');
  $('filter-row').classList.toggle('hidden',tab!=='cases');
- if(tab==='battle')renderBattle();
  if(tab==='cases'||tab==='inventory')render();
 }
 document.querySelectorAll('.bottom-nav [data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
@@ -118,7 +59,6 @@ function updateWheelStatus(){
  if(left<=0){status.textContent='Крутить колесо →';$('home-wheel').disabled=false}
  else{const h=Math.floor(left/3600000),m=Math.ceil((left%3600000)/60000);status.textContent='Следующее вращение через '+h+' ч '+m+' мин';$('home-wheel').disabled=true}
 }
-$('home-battle').onclick=()=>showTab('battle');
 $('home-inventory').onclick=()=>showTab('inventory');
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 $('home-wheel').onclick=()=>{
