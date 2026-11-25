@@ -37,6 +37,10 @@ jobs:
           test -f _site/css/style.css
           test -f _site/js/app.js
           cp -a public/. _site/
+          # Ensure the actual game entry point overrides the archived README.
+          cp index.html _site/index.html
+          test -f _site/index.html
+          grep -q 'id="cases"' _site/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
