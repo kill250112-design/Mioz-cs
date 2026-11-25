@@ -9,7 +9,8 @@ async function loadCases(){
  try{
   const response=await fetch(CASE_API);if(!response.ok)throw new Error('API');
   const data=await response.json();
-  cases=data.filter(c=>c.type==='Case'&&Array.isArray(c.contains)&&c.contains.length).map((c,i)=>{
+  const wantedCases=['Dreams & Nightmares Case','Revolution Case','Kilowatt Case','Gallery Case','Fever Case'];
+  cases=data.filter(c=>c.type==='Case'&&wantedCases.includes(c.name)&&Array.isArray(c.contains)&&c.contains.length).map((c,i)=>{
    const regular=c.contains.map(x=>[x.name,'',0,rarityWeight(x.rarity?.name),x.image,x.rarity?.color]);
    const rare=(c.contains_rare||[]).map(x=>[x.name,'',0,0.26,x.image,'#e4ae39']);
    const drops=[...regular,...rare];
@@ -17,7 +18,8 @@ async function loadCases(){
    const usd=CASE_PRICES_USD[c.name];
    return {id:'case-'+c.id,name:c.name,price:Math.round((usd||0.5)*USD_RUB),icon:'',image:c.image,drops};
   });
-  cases.sort((a,b)=>a.name.localeCompare(b.name));
+  const order=['Dreams & Nightmares Case','Revolution Case','Kilowatt Case','Gallery Case','Fever Case'];
+  cases.sort((a,b)=>order.indexOf(a.name)-order.indexOf(b.name));
   render();
  }catch(e){console.error('Не удалось загрузить каталог кейсов CS2',e)}
 }
