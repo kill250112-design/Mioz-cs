@@ -19,8 +19,7 @@
       <article class="info-card top-drop"><small>ТОП ДРОП</small><strong>Керамбит | Fade</strong><span>💎 52 000 ₽</span></article>
       <article class="info-card recent-drop"><small>НЕДАВНИЙ ДРОП</small><strong id="recent-drop">Пока нет дропов</strong><span>🕒 Последняя удача</span></article>
     </div>
-    <button class="feature-card battle-feature" id="home-battle"><span class="feature-icon">⚔️</span><span class="feature-copy"><strong>КЕЙС-БАТЛ</strong><small>Открывай кейсы<br>и получай скины</small></span></button>
-    <button class="feature-card wheel-feature" id="home-wheel"><span class="feature-icon">🎡</span><span class="feature-copy"><strong>КОЛЕСО ФОРТУНЫ</strong><small>Бесплатное вращение<br>раз в 12 часов</small><em id="wheel-status">Крутить колесо →</em></span></button>
+ id="home-wheel"><span class="feature-icon">🎡</span><span class="feature-copy"><strong>КОЛЕСО ФОРТУНЫ</strong><small>Бесплатное вращение<br>раз в 12 часов</small><em id="wheel-status">Крутить колесо →</em></span></button>
     <button class="feature-card inventory-feature" id="home-inventory"><span class="feature-icon">🎒</span><span class="feature-copy"><strong>ИНВЕНТАРЬ</strong><small>Скинов: <b id="home-inventory-count">0</b></small></span></button>
   </section>
   <section class="hero">
@@ -36,15 +35,8 @@
   </div>
   <section id="cases" class="grid"></section>
   <section id="inventory" class="grid hidden"></section>
-  <section id="battle" class="hidden">
-    <div class="battle-hero"><button id="back-cases" class="back-cases">← Назад к кейсам</button><small>CS2 CASE BATTLE</small><h2>Собери свой батл</h2><p>Выбери до трёх кейсов и сразись с ботом. У кого дороже дроп — тот победил!</p><div class="battle-stats"><span>⚡ 1 на 1</span><span>🎁 До 3 раундов</span><span>🏆 Победа за ценность</span></div></div>
-    <div class="battle-head"><h3>Выбери кейсы</h3><b id="battle-count">0 / 3</b></div>
-    <section id="battle-cases" class="grid"></section>
-    <div class="battle-footer"><div><span class="muted">Стоимость батла</span><strong id="battle-cost">0 ₽</strong></div><button id="start-battle" disabled>⚔️ Начать батл</button></div>
-    <div id="battle-result" class="battle-result hidden"></div>
-  </section>
-</main>
-<nav class="bottom-nav" aria-label="Навигация"><button class="active" data-tab="cases"><span>🎁</span>Кейсы</button><button data-tab="inventory"><span>🎒</span>Инвентарь</button><button data-tab="battle"><span>⚔️</span>Кейс-батл</button></nav>
+
+<nav class="bottom-nav" aria-label="Навигация"><button class="active" data-tab="cases"><span>🎁</span>Кейсы</button><button data-tab="inventory"><span>🎒</span>Инвентарь</button></nav>
 <div id="modal" class="modal hidden"><div class="dialog"><button id="close" class="close">×</button><small>ТВОЙ ДРОП</small><div id="result" class="drop">🎁</div><h2 id="dropName"></h2><b id="dropPrice"></b><button id="claim">Забрать</button></div></div>
 <footer>Демо-версия. Цены условные, не связаны с рынком Steam.</footer>
 </body>
