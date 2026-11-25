@@ -393,3 +393,6 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 #modal .dialog{width:100%!important;max-width:none!important;height:100dvh!important;min-height:100vh!important;border:0!important;border-radius:0!important;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:calc(28px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom))!important;background:transparent!important}
 #modal #result{width:100%;min-height:130px}
 #modal .spin-track span{flex:0 0 82px}
+
+/* JS controls the roulette movement so it starts immediately and eases to a stop */
+#modal .spin-track{animation:none!important;will-change:transform}
