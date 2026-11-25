@@ -8,6 +8,8 @@ let balance=1000,inventory=[],rolling=false,pending=null,expandedCase=null;
 try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)&&Array.isArray(saved.inventory)){balance=Math.max(0,saved.balance);inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)&&typeof x.icon==='string')}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
+function skinImage(name){const wear=name.includes('Karambit')||name.includes('Bayonet')||name.includes('Butterfly Knife')?'Factory New':'Field-Tested';return 'https://cdn2.csgo.com/item/'+encodeURIComponent(name+' ('+wear+')')+'/512.png'}
+function itemVisual(d,cls='skin-image'){return '<img class="'+cls+'" src="'+skinImage(d[0])+'" alt="'+d[0]+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+d[1]+'</span>'}
 function chooseDrop(c){let roll=Math.random()*100;for(const d of c.drops){roll-=d[3];if(roll<0)return d}return c.drops[c.drops.length-1]}
 function render(){
  saveGame();$('balance').textContent=money(balance);
@@ -15,8 +17,8 @@ function render(){
  const recent=$('recent-drop');if(recent)recent.textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет дропов';
  $('cases').setAttribute('aria-live','polite');$('inventory').setAttribute('aria-live','polite');
  const selected=cases.find(c=>c.id===expandedCase);
- $('cases').innerHTML=selected?`<section class="case-detail"><button class="detail-back" data-back>← Все кейсы</button><div class="detail-art">${selected.icon}</div><h2>${selected.name}</h2><p class="muted">Стоимость открытия: ${money(selected.price)}</p><button type="button" class="open detail-open" data-open="${selected.id}">Открыть · ${money(selected.price)}</button><h3 class="odds-title">Содержимое кейса и шансы</h3><div class="case-contents"><div class="contents-list">${selected.drops.map(d=>`<div class="contents-row"><span>${d[1]} ${d[0]}</span><b>${d[3]}%</b><small>Цена: ${money(d[2])}</small></div>`).join('')}</div></div></section>`:cases.map(c=>`<article class="case case-tile" data-case="${c.id}"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}">Посмотреть кейс</button></article>`).join('');
- $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>`<article class="case"><div class="art">${x.icon}</div><h3>${x.name}</h3><b class="price">${money(x.price)}</b><button data-sell="${i}">Продать</button></article>`).join(''):'<p class="muted">Инвентарь пуст — открой кейс!</p>';
+ $('cases').innerHTML=selected?`<section class="case-detail"><button class="detail-back" data-back>← Все кейсы</button><div class="detail-art">${selected.icon}</div><h2>${selected.name}</h2><p class="muted">Стоимость открытия: ${money(selected.price)}</p><button type="button" class="open detail-open" data-open="${selected.id}">Открыть · ${money(selected.price)}</button><h3 class="odds-title">Содержимое кейса и шансы</h3><div class="case-contents"><div class="contents-list">${selected.drops.map(d=>`<div class="contents-row"><span>${itemVisual(d)} <span class="skin-name">${d[0]}</span></span><b>${d[3]}%</b><small>Цена: ${money(d[2])}</small></div>`).join('')}</div></div></section>`:cases.map(c=>`<article class="case case-tile" data-case="${c.id}"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}">Посмотреть кейс</button></article>`).join('');
+ $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>`<article class="case"><div class="art">${itemVisual([x.name,x.icon,x.price,0])}</div><h3>${x.name}</h3><b class="price">${money(x.price)}</b><button data-sell="${i}">Продать</button></article>`).join(''):'<p class="muted">Инвентарь пуст — открой кейс!</p>';
  document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>{expandedCase=b.dataset.case;render()});
  document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openCase(b.dataset.open));
  document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{expandedCase=null;render()});
@@ -29,7 +31,7 @@ function openCase(id){
  $('modal').classList.remove('hidden');$('dropName').textContent='Крутим кейс...';$('dropPrice').textContent='';$('claim').textContent='Ожидай...';$('claim').disabled=true;
  const targetIndex=24,total=30;
  const items=Array.from({length:total},(_,i)=>i===targetIndex?pending:chooseDrop(c));
- $('result').innerHTML='<div class="roulette-marker"></div><div class="spin-track">'+items.map(x=>'<span>'+x[1]+'</span>').join('')+'</div>';
+ $('result').innerHTML='<div class="roulette-marker"></div><div class="spin-track">'+items.map(x=>'<span class="roulette-item"><img src="'+skinImage(x[0])+'" alt="'+x[0]+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><i style="display:none">'+x[1]+'</i></span>').join('')+'</div>';
  const track=$('result').querySelector('.spin-track');track.style.animation='none';track.style.transition='none';track.style.transform='translateX(0)';
  requestAnimationFrame(()=>requestAnimationFrame(()=>{
   const card=track.querySelector('span'),step=card.getBoundingClientRect().width+12;
@@ -37,7 +39,7 @@ function openCase(id){
   track.style.transition='transform 4.2s cubic-bezier(.08,.72,.12,1)';
   track.style.transform='translateX('+offset+'px)';
  }));
- setTimeout(()=>{rolling=false;$('result').innerHTML='<div class="drop-reveal">'+pending[1]+'</div>';$('dropName').textContent=pending[0];$('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс выпадения: '+pending[3]+'%';$('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;},4400);
+ setTimeout(()=>{rolling=false;$('result').innerHTML='<div class="drop-reveal">'+itemVisual(pending,'reveal-image')+'</div>';$('dropName').textContent=pending[0];$('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс выпадения: '+pending[3]+'%';$('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;},4400);
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
