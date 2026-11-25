@@ -330,3 +330,16 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 
 /* Hide obsolete category chips (Все / Оружие / Ножи) everywhere */
 .filter-row,.filter-row *,[data-filter]{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important}
+
+/* Case contents, odds and Cases tab */
+.case-contents{margin:8px 0 10px;border:1px solid #393b48;border-radius:11px;background:#0d0e13;overflow:hidden}
+.case-contents summary{padding:10px 9px;color:#c9baff;font-size:11px;font-weight:800;cursor:pointer;list-style:none}
+.case-contents summary:after{content:'＋';float:right}
+.case-contents[open] summary:after{content:'−'}
+.contents-list{padding:0 9px 7px}
+.contents-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 8px;padding:8px 0;border-top:1px solid #292a32;font-size:10px;align-items:center}
+.contents-row span{min-width:0;overflow-wrap:anywhere;color:#e4e2ed}
+.contents-row b{color:#ffdc78;font-size:11px}
+.contents-row small{grid-column:1/-1;color:#9295a5;font-size:10px}
+.bottom-nav{width:min(520px,calc(100% - 24px))!important}
+@media(max-width:520px){.contents-row{font-size:9px}.case-contents summary{font-size:10px}}
