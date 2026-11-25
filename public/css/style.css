@@ -303,3 +303,27 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
  .cases-heading h2{font-size:21px}
 }
 @media(max-width:370px){.logo{font-size:28px}.top-actions{gap:6px}.balance-pill{padding:9px}.topup{padding:10px 12px}.feature-card{gap:10px;padding:15px 12px}.feature-copy strong{font-size:19px}}
+
+
+/* Case battle: visible drop odds and animated reels */
+.battle-case{display:flex;flex-direction:column;align-items:stretch}
+.battle-case.selected{border-color:#8b70e8!important;box-shadow:0 0 0 2px #8b70e855,0 12px 28px #0008!important}
+.battle-case .choose-case{width:100%;margin-top:12px}
+.battle-odds{margin-top:10px;border:1px solid #343540;border-radius:12px;background:#101116;overflow:hidden}
+.battle-odds summary{padding:10px 12px;color:#c9baff;font-size:13px;font-weight:700;cursor:pointer;list-style:none}
+.battle-odds summary:after{content:'＋';float:right}
+.battle-odds[open] summary:after{content:'−'}
+.odds-list{padding:0 12px 10px}
+.odds-row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid #292a32;font-size:12px;color:#c5c6d0}
+.odds-row b{color:#f4d47a;white-space:nowrap}
+.battle-spins{display:grid;gap:18px;margin:18px 0}
+.battle-spin-round{padding:14px;border:1px solid #393345;border-radius:18px;background:#101116}
+.battle-spin-round> b{display:block;margin-bottom:12px;color:#c7b7ff;font-size:13px}
+.battle-spin{margin:12px 0}
+.battle-spin>small{display:block;margin-bottom:7px;color:#aeb0bd;font-size:11px;font-weight:800;letter-spacing:1px}
+.battle-reel{height:94px;position:relative;overflow:hidden;border:1px solid #51466f;border-radius:12px;background:#0a0b10}
+.battle-reel>i{position:absolute;z-index:2;left:50%;top:0;bottom:0;width:2px;background:#ffdb72;box-shadow:0 0 12px #ffcb43}
+.battle-reel-track{height:100%;display:flex;gap:8px;align-items:center;width:max-content;transform:translateX(0);transition:transform 4.8s cubic-bezier(.08,.72,.08,1)}
+.battle-reel-track>span{width:76px;height:74px;flex:0 0 76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid #3c3d49;border-radius:9px;background:linear-gradient(145deg,#252637,#151620);font-size:27px}
+.battle-reel-track>span small{max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;color:#c3c3cf}
+@media(prefers-reduced-motion:reduce){.battle-reel-track{transition-duration:.01ms}}
