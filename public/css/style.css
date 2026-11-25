@@ -396,3 +396,18 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 
 /* JS controls the roulette movement so it starts immediately and eases to a stop */
 #modal .spin-track{animation:none!important;will-change:transform}
+
+/* Real CS2 item renders in case contents, roulette and inventory */
+.skin-image{width:100%;height:88px;object-fit:contain;display:block;margin:0 auto 6px;mix-blend-mode:screen}
+.skin-name{display:block;font-size:12px;line-height:1.3}
+.contents-row{display:grid!important;grid-template-columns:100px 1fr auto;align-items:center;gap:10px}
+.contents-row>span:first-child{display:contents}
+.contents-row .skin-image{grid-column:1;grid-row:1/3;height:70px;width:100px;margin:0}
+.contents-row .skin-name{grid-column:2;grid-row:1/3}
+.contents-row>b{grid-column:3;grid-row:1}
+.contents-row>small{grid-column:3;grid-row:2}
+.roulette-item{display:flex;align-items:center;justify-content:center;flex:0 0 120px!important;width:120px!important;height:112px!important;background:#24263b;border:1px solid #4b4568;border-radius:14px;padding:8px}
+.roulette-item img{width:100%;height:100%;object-fit:contain}
+.reveal-image{width:min(80vw,360px);height:210px;object-fit:contain;display:block;margin:auto}
+.drop-reveal{display:grid;place-items:center}
+.art .skin-image{height:130px;width:100%;margin:0}
