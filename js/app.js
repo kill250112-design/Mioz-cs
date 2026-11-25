@@ -36,7 +36,7 @@ async function loadCases(){
 let balance=1000,inventory=[],rolling=false,pending=null,expandedCase=null;
 try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)&&Array.isArray(saved.inventory)){balance=Math.max(0,saved.balance);inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)&&typeof x.icon==='string')}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
-function formatChance(value){return (value<1?value.toFixed(2):Math.round(value))+'%';}
+function formatChance(value){return Number(value).toLocaleString('ru-RU',{minimumFractionDigits:value<1?4:0,maximumFractionDigits:4})+'%';}
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
 function skinImage(name){const wear=name.includes('Karambit')||name.includes('Bayonet')||name.includes('Butterfly Knife')?'Factory New':'Field-Tested';return 'https://cdn2.csgo.com/item/'+encodeURIComponent(name+' ('+wear+')')+'/512.png'}
 function itemVisual(d,cls='skin-image'){return '<img class="'+cls+'" src="'+(d[4]||skinImage(d[0]))+'" alt="'+d[0]+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+d[1]+'</span>'}
