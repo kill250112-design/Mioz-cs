@@ -21,7 +21,17 @@ async function loadCases(){
    const regular=c.contains.map(x=>[x.name,'',itemMarketPrice(x.name,x.rarity?.name),rarityWeight(x.rarity?.name),x.image,x.rarity?.color]);
    const rare=(c.contains_rare||[]).map(x=>[x.name,'',itemMarketPrice(x.name,'Special'),0.26,x.image,'#e4ae39']);
    const drops=[...regular,...rare];
-   const total=drops.reduce((s,d)=>s+d[3],0);drops.forEach(d=>d[3]=d[3]/total*100);
+   // Шансы рассчитываются по цене: чем дороже предмет, тем ниже его вероятность.
+   // Распределяем 100% с точностью до миллионной доли процента, чтобы сумма была ровно 100%.
+   const weights=drops.map(d=>1/Math.sqrt(Math.max(1,d[2])));
+   const weightTotal=weights.reduce((s,w)=>s+w,0);
+   const units=100000000;
+   const shares=weights.map(w=>w/weightTotal*units);
+   const assigned=shares.map(Math.floor);
+   let remainder=units-assigned.reduce((s,n)=>s+n,0);
+   const priority=shares.map((v,i)=>({i,f:v-Math.floor(v)})).sort((a,b)=>b.f-a.f);
+   for(let i=0;i<remainder;i++)assigned[priority[i].i]++;
+   drops.forEach((d,i)=>d[3]=assigned[i]/1000000);
    // В списке кейса дорогие скины сверху, дешёвые снизу.
    drops.sort((a,b)=>b[2]-a[2]);
    const usd=CASE_PRICES_USD[c.name];
@@ -36,7 +46,7 @@ async function loadCases(){
 let balance=1000,inventory=[],rolling=false,pending=null,expandedCase=null;
 try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)&&Array.isArray(saved.inventory)){balance=Math.max(0,saved.balance);inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)&&typeof x.icon==='string')}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
-function formatChance(value){return Number(value).toLocaleString('ru-RU',{minimumFractionDigits:value<1?4:0,maximumFractionDigits:4})+'%';}
+function formatChance(value){return Number(value).toLocaleString('ru-RU',{minimumFractionDigits:value<1?4:0,maximumFractionDigits:6})+'%';}
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
 function skinImage(name){const wear=name.includes('Karambit')||name.includes('Bayonet')||name.includes('Butterfly Knife')?'Factory New':'Field-Tested';return 'https://cdn2.csgo.com/item/'+encodeURIComponent(name+' ('+wear+')')+'/512.png'}
 function itemVisual(d,cls='skin-image'){return '<img class="'+cls+'" src="'+(d[4]||skinImage(d[0]))+'" alt="'+d[0]+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+d[1]+'</span>'}
