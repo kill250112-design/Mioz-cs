@@ -4,7 +4,7 @@ const cases=[
 {id:'legend',name:'Легендарный кейс',price:700,icon:'🔥',drops:[['Glock-18 | Water Elemental','💧',900,45],['AWP | Hyper Beast','🦖',8500,30],['AK-47 | Fire Serpent','🐍',18000,20],['Karambit | Crimson Web','🕸️',32000,5]]},
 {id:'knife',name:'Ножевой кейс',price:1200,icon:'🔪',drops:[['Bayonet | Forest','🌳',6500,45],['Butterfly Knife | Waves','🦋',18000,30],['Karambit | Fade','🔪',24000,20],['Karambit | Ruby','💎',52000,5]]}
 ];
-let balance=1000,inventory=[],rolling=false,pending=null;
+let balance=1000,inventory=[],rolling=false,pending=null,expandedCase=null;
 try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)&&Array.isArray(saved.inventory)){balance=Math.max(0,saved.balance);inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)&&typeof x.icon==='string')}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
@@ -14,9 +14,10 @@ function render(){
  const count=$('home-inventory-count');if(count)count.textContent=inventory.length;
  const recent=$('recent-drop');if(recent)recent.textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет дропов';
  $('cases').setAttribute('aria-live','polite');$('inventory').setAttribute('aria-live','polite');
- $('cases').innerHTML=cases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><details class="case-contents"><summary>Содержимое и шансы</summary><div class="contents-list">${c.drops.map(d=>`<div class="contents-row"><span>${d[1]} ${d[0]}</span><b>${d[3]}%</b><small>${money(d[2])}</small></div>`).join('')}</div></details><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>Открыть кейс</button></article>`).join('');
+ $('cases').innerHTML=cases.map(c=>`<article class="case"><div class="art">${c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}" ${balance<c.price?'disabled':''}>${expandedCase===c.id?'Скрыть содержимое':'Открыть'}</button>${expandedCase===c.id?`<div class="case-contents"><div class="contents-list">${c.drops.map(d=>`<div class="contents-row"><span>${d[1]} ${d[0]}</span><b>${d[3]}%</b><small>${money(d[2])}</small></div>`).join('')}</div><button class="open start-open" data-start="${c.id}" ${balance<c.price?'disabled':''}>Начать открытие · ${money(c.price)}</button></div>`:''}</article>`).join('');
  $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>`<article class="case"><div class="art">${x.icon}</div><h3>${x.name}</h3><b class="price">${money(x.price)}</b><button data-sell="${i}">Продать</button></article>`).join(''):'<p class="muted">Инвентарь пуст — открой кейс!</p>';
- document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>openCase(b.dataset.case));
+ document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>{expandedCase=expandedCase===b.dataset.case?null:b.dataset.case;render()});
+ document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{const id=b.dataset.start;expandedCase=null;openCase(id)});
  document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
 }
 function openCase(id){
