@@ -53,11 +53,3 @@ document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
 render();
 $('home-inventory').onclick=()=>showTab('inventory');
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
-$('home-wheel').onclick=()=>{
- const last=Number(localStorage.getItem('cs2-wheel-last')||0);
- if(Date.now()-last<12*60*60*1000){updateWheelStatus();return}
- const prizes=[100,150,200,250,300,500],prize=prizes[Math.floor(Math.random()*prizes.length)];
- localStorage.setItem('cs2-wheel-last',String(Date.now()));balance+=prize;
- alert('🎉 Колесо фортуны! Тебе выпало '+money(prize));
- render();
-};
