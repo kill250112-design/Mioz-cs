@@ -30,13 +30,14 @@ function openCase(id){
  const targetIndex=24,total=30;
  const items=Array.from({length:total},(_,i)=>i===targetIndex?pending:chooseDrop(c));
  $('result').innerHTML='<div class="roulette-marker"></div><div class="spin-track">'+items.map(x=>'<span>'+x[1]+'</span>').join('')+'</div>';
- const track=$('result').querySelector('.spin-track');track.style.transform='translateX(0)';
+ const track=$('result').querySelector('.spin-track');track.style.animation='none';track.style.transition='none';track.style.transform='translateX(0)';
  requestAnimationFrame(()=>requestAnimationFrame(()=>{
   const card=track.querySelector('span'),step=card.getBoundingClientRect().width+12;
   const offset=$('result').clientWidth/2-(targetIndex*step+card.getBoundingClientRect().width/2);
+  track.style.transition='transform 4.2s cubic-bezier(.08,.72,.12,1)';
   track.style.transform='translateX('+offset+'px)';
  }));
- setTimeout(()=>{rolling=false;$('result').innerHTML='<div class="drop-reveal">'+pending[1]+'</div>';$('dropName').textContent=pending[0];$('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс выпадения: '+pending[3]+'%';$('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;},4900);
+ setTimeout(()=>{rolling=false;$('result').innerHTML='<div class="drop-reveal">'+pending[1]+'</div>';$('dropName').textContent=pending[0];$('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс выпадения: '+pending[3]+'%';$('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;},4400);
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
