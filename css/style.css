@@ -361,3 +361,23 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 .case-tile{cursor:pointer}
 .case-tile .open{margin-top:auto}
 @media(max-width:520px){.case-detail{min-height:calc(100dvh - 165px);padding:14px 12px 22px}.case-detail .contents-row{font-size:12px}}
+
+
+/* Case detail uses the same full-viewport presentation as the roulette */
+.case-detail{
+ position:fixed!important;inset:0!important;z-index:50!important;
+ width:100vw!important;max-width:none!important;height:100dvh!important;min-height:100dvh!important;
+ margin:0!important;padding:calc(18px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom))!important;
+ border:0!important;border-radius:0!important;overflow-y:auto!important;overscroll-behavior:contain;
+ background:radial-gradient(ellipse at 50% 0%,#302653 0,#171827 48%,#0b0d17 100%)!important;
+}
+.case-detail .detail-art{height:clamp(170px,30vh,280px);flex:0 0 auto}
+.case-detail .detail-open{min-height:58px;font-size:19px}
+.case-detail .case-contents{flex:0 0 auto}
+.case-detail .contents-list{padding:4px 16px 14px}
+.case-detail .contents-row{padding:14px 0;font-size:14px}
+.case-detail .contents-row b{font-size:15px}
+@media(max-width:520px){
+ .case-detail{padding:calc(14px + env(safe-area-inset-top)) 14px calc(20px + env(safe-area-inset-bottom))!important}
+ .case-detail .detail-art{height:27vh;min-height:150px}
+}
