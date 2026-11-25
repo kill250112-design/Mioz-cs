@@ -11,13 +11,23 @@
 <body>
 <header class="topbar">
   <b class="logo">CS<span>2</span><i> CASES</i></b>
-  <div class="balance-pill"><span>★</span><small>Баланс</small><strong id="balance">1 000 ₽</strong></div>
+  <div class="top-actions"><div class="balance-pill"><span>💰</span><strong id="balance">1 000 ₽</strong></div><button class="topup" id="topup">Пополнить</button></div>
 </header>
 <main>
+  <section id="home-dashboard" class="home-dashboard">
+    <div class="info-strip">
+      <article class="info-card top-drop"><small>ТОП ДРОП</small><strong>Керамбит | Fade</strong><span>💎 52 000 ₽</span></article>
+      <article class="info-card recent-drop"><small>НЕДАВНИЙ ДРОП</small><strong id="recent-drop">Пока нет дропов</strong><span>🕒 Последняя удача</span></article>
+    </div>
+    <button class="feature-card battle-feature" id="home-battle"><span class="feature-icon">⚔️</span><span class="feature-copy"><strong>КЕЙС-БАТЛ</strong><small>Открывай кейсы<br>и получай скины</small></span></button>
+    <button class="feature-card wheel-feature" id="home-wheel"><span class="feature-icon">🎡</span><span class="feature-copy"><strong>КОЛЕСО ФОРТУНЫ</strong><small>Бесплатное вращение<br>раз в 12 часов</small><em id="wheel-status">Крутить колесо →</em></span></button>
+    <button class="feature-card inventory-feature" id="home-inventory"><span class="feature-icon">🎒</span><span class="feature-copy"><strong>ИНВЕНТАРЬ</strong><small>Скинов: <b id="home-inventory-count">0</b></small></span></button>
+  </section>
   <section class="hero">
     <div class="hero-copy"><small>ТВОЯ УДАЧА — ТВОЙ ДРОП</small><h1>Открывай кейсы.<br><em>Забирай скины.</em></h1><p>Выбирай кейс и испытай удачу!</p></div>
     <div class="hero-art" aria-hidden="true"><span class="hero-gem">💎</span><span class="hero-box">🎁</span><span class="hero-spark">✦</span></div>
   </section>
+  <div class="cases-heading"><h2>КЕЙСЫ</h2><span>Выбирай и открывай</span></div>
   <div class="filter-row" id="filter-row">
     <button class="filter active" data-filter="all">Все</button>
     <button class="filter" data-filter="weapon">Оружие</button>
