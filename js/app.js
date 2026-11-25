@@ -36,7 +36,6 @@ function openCase(id){
   const offset=$('result').clientWidth/2-(targetIndex*step+card.getBoundingClientRect().width/2);
   track.style.transform='translateX('+offset+'px)';
  }));
- render();
  setTimeout(()=>{rolling=false;$('result').innerHTML='<div class="drop-reveal">'+pending[1]+'</div>';$('dropName').textContent=pending[0];$('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс выпадения: '+pending[3]+'%';$('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;},4900);
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
