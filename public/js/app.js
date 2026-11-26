@@ -13,7 +13,7 @@ function render(){
  $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="case"><div class="art">'+itemVisual(x)+'</div><h3>'+escapeHTML(x.name)+'</h3><b class="price">'+money(x.price)+'</b><button data-sell="'+i+'">Продать</button></article>').join(''):'<p class="muted">Инвентарь пока пуст.</p>';
  document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
 }
-$('home-inventory').onclick=()=>navigatePage('inventory');
+
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 render();
 
