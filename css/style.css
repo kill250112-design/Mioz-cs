@@ -557,3 +557,20 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 .case-detail .contents-row b{color:#d8bd86}
 .case-detail .contents-row small{color:#9ca6a1}
 @media(max-width:380px){#cases.grid{gap:8px}#cases .case-tile{padding:9px}#cases .case-tile h3{font-size:12px}}
+
+
+/* Real CS2-style animated case roulette: artwork and names stay visible */
+#modal.case-opening .cs2-reel-stage{height:clamp(270px,68vw,360px)!important;min-height:270px!important;display:block!important;position:relative!important;overflow:hidden!important;border:1px solid #8b754c!important;border-radius:5px!important;background:radial-gradient(ellipse at 50% 50%,#384044 0%,#20292c 58%,#12191b 100%)!important}
+#modal.case-opening .cs2-reel-stage:before,#modal.case-opening .cs2-reel-stage:after{content:"";position:absolute;z-index:4;top:0;bottom:0;width:12%;pointer-events:none}
+#modal.case-opening .cs2-reel-stage:before{left:0;background:linear-gradient(90deg,#11191bf2,transparent)}
+#modal.case-opening .cs2-reel-stage:after{right:0;background:linear-gradient(270deg,#11191bf2,transparent)}
+#modal.case-opening .cs2-reel{position:absolute!important;inset:0!important;display:flex!important;align-items:center!important;overflow:hidden!important;padding:0!important;min-height:0!important}
+#modal.case-opening .cs2-reel-track{height:100%;width:max-content;display:flex;align-items:center;gap:9px;padding:0 10px;will-change:transform}
+#modal.case-opening .cs2-reel-item{width:clamp(112px,30vw,150px);height:82%;flex:0 0 clamp(112px,30vw,150px);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:10px 7px;border:1px solid #777e7b;border-bottom:3px solid #b18b4d;background:linear-gradient(160deg,#46504e,#252e30 70%);box-shadow:0 7px 18px #0008}
+#modal.case-opening .cs2-reel-art{width:100%;height:72%;display:grid;place-items:center;background:radial-gradient(ellipse,#59635c,#293231 70%);overflow:hidden}
+#modal.case-opening .cs2-reel-image{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;filter:drop-shadow(0 8px 7px #000b)}
+#modal.case-opening .cs2-reel-item .skin-fallback{display:grid!important;place-items:center;width:100%;height:100%;font-size:42px;background:radial-gradient(ellipse,#59635c,#293231 70%)}
+#modal.case-opening .cs2-reel-item>b{width:100%;min-height:28px;text-align:center;font-size:10px;line-height:1.3;color:#f0f1eb;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#modal.case-opening .cs2-reel-stage .opening-pointer{display:block!important;z-index:6!important;left:50%;width:3px;background:#f2c66d;box-shadow:0 0 15px #f2c66d}
+#modal.case-opening .opening-winner{width:100%;height:100%;min-height:260px;background:radial-gradient(ellipse,#4a594f,#202a29 70%);border:1px solid #c4a365}
+#modal.case-opening .opening-winner .reveal-image{width:min(85%,440px)!important;height:90%!important;max-width:440px!important;object-fit:contain!important}
