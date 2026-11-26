@@ -13,7 +13,7 @@ function render(){
  $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="case"><div class="art">'+itemVisual(x)+'</div><h3>'+escapeHTML(x.name)+'</h3><b class="price">'+money(x.price)+'</b><button data-sell="'+i+'">Продать</button></article>').join(''):'<p class="muted">Инвентарь пока пуст.</p>';
  document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
 }
-$('home-inventory').onclick=()=>document.getElementById('inventory').scrollIntoView({behavior:'smooth',block:'start'});
+$('home-inventory').onclick=()=>navigatePage('inventory');
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 render();
 
@@ -118,3 +118,16 @@ async function renderCaseCatalog(){
  }
 }
 renderCaseCatalog();
+
+
+// Отдельные страницы разделов с адресами #home, #cases и #inventory.
+function navigatePage(page){
+ const allowed=['home','cases','inventory'];if(!allowed.includes(page))page='home';
+ document.querySelectorAll('[data-page-view]').forEach(el=>el.classList.toggle('active',el.id==='page-'+page));
+ document.querySelectorAll('[data-page]').forEach(el=>{const active=el.dataset.page===page;el.classList.toggle('active',active);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current')});
+ if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-page]').forEach(button=>button.addEventListener('click',()=>navigatePage(button.dataset.page)));
+window.addEventListener('hashchange',()=>navigatePage(location.hash.slice(1)));
+navigatePage(location.hash.slice(1)||'home');
