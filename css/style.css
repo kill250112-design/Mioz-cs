@@ -474,3 +474,7 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 /* Small skin icons shown while the original roulette spins */
 #modal.case-opening .roulette-item{position:relative}
 #modal.case-opening .roulette-icon{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);font-style:normal;font-size:22px;line-height:1;filter:drop-shadow(0 2px 4px #000);pointer-events:none}
+
+/* Fallback marker if a skin artwork host is temporarily unavailable */
+#modal.case-opening .roulette-icon{position:absolute;inset:0;place-items:center;color:#d9d5ff;font-size:28px;font-style:normal;background:linear-gradient(145deg,#302d4b,#1b1d30)}
+#modal.case-opening .roulette-item img{position:relative;z-index:1}
