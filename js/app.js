@@ -1,15 +1,32 @@
-let balance=1000,latestDrop='',caseCatalog=[];
+let balance=1000,latestDrop='',inventory=[],caseCatalog=[];
 const CASE_PRICE=100;
-try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance);latestDrop=typeof saved.latestDrop==='string'?saved.latestDrop:''}}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance);latestDrop=typeof saved.latestDrop==='string'?saved.latestDrop:'';inventory=Array.isArray(saved.inventory)?saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)) : []}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
-function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,latestDrop}))}catch(e){}}
+function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,latestDrop,inventory}))}catch(e){}}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function render(){
  saveGame();
  $('balance').textContent=money(balance);
  $('recent-drop').textContent=latestDrop||'Пока не открывал кейсы';
+ renderInventory();
 }
 render();
+function renderInventory(){
+ const grid=$('inventory-grid'),count=$('inventory-count');
+ if(!grid||!count)return;
+ count.textContent=inventory.length+' предметов';
+ grid.innerHTML=inventory.length?inventory.slice().reverse().map(item=>'<article class="inventory-item"><div class="inventory-item-art">'+(item.image?'<img src="'+escapeHTML(item.image)+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'">':'')+'<span class="inventory-item-fallback" '+(item.image?'style="display:none"':'')+'>🔫</span></div><div class="inventory-item-info"><b>'+escapeHTML(item.name)+'</b><span>'+escapeHTML(item.rarity||'CS2 skin')+'</span><strong>≈ '+money(item.price)+'</strong></div></article>').join(''):'<div class="inventory-empty"><span>🎒</span><b>Инвентарь пока пуст</b><p>Открой кейс и забери первый предмет — он появится здесь</p><button data-page="cases">Перейти к кейсам</button></div>';
+ grid.querySelectorAll('[data-page="cases"]').forEach(button=>button.onclick=()=>showPage('cases'));
+}
+function showPage(page){
+ const isInventory=page==='inventory';
+ $('home-dashboard').classList.toggle('hidden',isInventory);
+ $('case-catalog').classList.toggle('hidden',isInventory);
+ $('inventory-page').classList.toggle('hidden',!isInventory);
+ document.querySelectorAll('.bottom-nav [data-page]').forEach(button=>button.classList.toggle('active',button.dataset.page===page));
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.bottom-nav [data-page]').forEach(button=>button.addEventListener('click',()=>showPage(button.dataset.page)));
 
 const CASES_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
 const rarityWeights={'Consumer Grade':79.92,'Industrial Grade':15.98,'Mil-Spec Grade':3.2,'Restricted':0.64,'Classified':0.128,'Covert':0.0256,'Extraordinary':0.0064};
@@ -56,7 +73,7 @@ function showOpening(crate){
    status.textContent='ВЫПАЛ ПРЕДМЕТ!';$('opening-drop-name').textContent=winner.name;$('opening-drop-price').textContent='≈ '+money(winner.price);
    result.classList.remove('hidden');const stage=modal.querySelector('.opening-stage');
    stage.insertAdjacentHTML('beforeend','<div class="opening-winner">'+(winner.image?'<img class="reveal-image" src="'+escapeHTML(winner.image)+'" alt="'+escapeHTML(winner.name)+'" onerror="this.style.display=\'none\'">':'<span class="burst-box">🔫</span>')+'</div>');
-   $('opening-claim').onclick=()=>{latestDrop=winner.name;render();close()};
+   $('opening-claim').onclick=()=>{latestDrop=winner.name;inventory.push({...winner});render();close()};
   },6400);
  },800);
 }
