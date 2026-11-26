@@ -167,3 +167,17 @@ button:focus-visible{
 .opening-winner{position:absolute;z-index:6;inset:0;height:100%;pointer-events:none;background:radial-gradient(circle,#263b5b88,transparent 70%)}
 .opening-result .opening-drop-name{overflow-wrap:anywhere}
 @media(max-width:520px){.case-open-button{min-height:40px;font-size:10px;padding:8px 4px}}
+
+
+/* Smooth case roulette: centered winner and clear landing feedback */
+.cs2-reel-track{backface-visibility:hidden;transform:translate3d(0,0,0)}
+.cs2-reel-item{transition:border-color .25s,box-shadow .25s,filter .25s}
+.cs2-reel-item.is-winning{border-color:#ffe08a;box-shadow:0 0 0 2px #f3c75c66,0 0 28px #f3c75c88;filter:brightness(1.18);animation:reelWinnerPulse .7s ease-in-out 2}
+@keyframes reelWinnerPulse{50%{transform:scale(1.045);box-shadow:0 0 0 3px #ffe08a99,0 0 38px #f3c75caa}}
+
+
+/* Real horizontal roulette movement and clear center marker */
+.opening-stage .cs2-reel{overflow:hidden}
+.cs2-reel-track{position:relative;flex-shrink:0;transform:translate3d(0,0,0);will-change:transform}
+.opening-pointer{z-index:8;pointer-events:none}
+.cs2-reel-item.is-winning{position:relative;z-index:3;border-color:#ffe08a;box-shadow:0 0 0 2px #ffe08a66,0 0 30px #f3c75caa;filter:brightness(1.2)}
