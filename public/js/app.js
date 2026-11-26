@@ -66,21 +66,41 @@ function render(){
  document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
 }
 function openCase(id){
- if(rolling)return;const c=cases.find(x=>x.id===id);if(!c)return;if(balance<c.price){alert('Недостаточно монет для открытия кейса. Пополни баланс.');return;}
+ if(rolling)return;
+ const c=cases.find(x=>x.id===id);if(!c)return;
+ if(balance<c.price){alert('Недостаточно монет для открытия кейса. Пополни баланс.');return;}
  balance-=c.price;rolling=true;pending=chooseDrop(c);
  saveGame();$('balance').textContent=money(balance);
- $('modal').classList.remove('hidden');$('dropName').textContent='Крутим кейс...';$('dropPrice').textContent='';$('claim').textContent='Ожидай...';$('claim').disabled=true;
- const targetIndex=24,total=30;
+ $('modal').classList.remove('hidden');
+ $('modal').classList.add('case-opening');
+ $('modal').querySelector('.dialog').innerHTML=
+  '<button id="close" class="close" aria-label="Закрыть">×</button>'+
+  '<div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>Открываем кейс</h2><p>'+c.name+'</p></div>'+
+  '<div class="opening-stage"><div class="opening-glow"></div><div class="opening-pointer"></div><div id="result" class="drop opening-reel"></div><div class="opening-scan"></div></div>'+
+  '<div class="opening-status" id="openingStatus"><span class="opening-pulse"></span> Ищем твой дроп...</div>'+
+  '<h2 id="dropName" class="opening-drop-name">Удачи!</h2><b id="dropPrice" class="opening-drop-price"></b>'+
+  '<button id="claim" class="opening-claim" disabled>Крутится...</button>'+
+  '<div class="opening-footnote">Результат определяется шансами предметов</div>';
+ $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
+ const targetIndex=34,total=42;
  const items=Array.from({length:total},(_,i)=>i===targetIndex?pending:chooseDrop(c));
- $('result').innerHTML='<div class="roulette-marker"></div><div class="spin-track">'+items.map(x=>'<span class="roulette-item"><img src="'+(x[4]||skinImage(x[0]))+'" alt="'+x[0]+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><i style="display:none">'+x[1]+'</i></span>').join('')+'</div>';
- const track=$('result').querySelector('.spin-track');track.style.animation='none';track.style.transition='none';track.style.transform='translateX(0)';
+ $('result').innerHTML='<div class="opening-track">'+items.map(x=>'<span class="roulette-item"><img src="'+(x[4]||skinImage(x[0]))+'" alt="'+x[0]+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><i style="display:none">'+x[1]+'</i></span>').join('')+'</div>';
+ const track=$('result').querySelector('.opening-track');
  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-  const card=track.querySelector('span'),step=card.getBoundingClientRect().width;
+  const card=track.querySelector('.roulette-item'),step=card.getBoundingClientRect().width;
   const offset=$('result').clientWidth/2-(targetIndex*step+card.getBoundingClientRect().width/2);
-  track.style.transition='transform 4.2s cubic-bezier(.08,.72,.12,1)';
-  track.style.transform='translateX('+offset+'px)';
+  track.style.transform='translate3d(0,0,0)';
+  track.style.transition='transform 5.8s cubic-bezier(.08,.72,.12,1)';
+  requestAnimationFrame(()=>{track.style.transform='translate3d('+offset+'px,0,0)'});
  }));
- setTimeout(()=>{rolling=false;$('result').innerHTML='<div class="drop-reveal">'+itemVisual(pending,'reveal-image')+'</div>';$('dropName').textContent=pending[0];$('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс выпадения: '+pending[3]+'%';$('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;},4400);
+ setTimeout(()=>{
+  rolling=false;
+  $('result').innerHTML='<div class="opening-winner">'+itemVisual(pending,'reveal-image')+'</div>';
+  $('openingStatus').innerHTML='<span class="opening-won">★</span> ПРЕДМЕТ ВЫПАЛ';
+  $('dropName').textContent=pending[0];
+  $('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс: '+formatChance(pending[3]);
+  $('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;
+ },6000);
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
