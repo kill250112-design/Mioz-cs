@@ -429,3 +429,37 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 
 /* Lower skin icons slightly while the roulette is spinning */
 #modal #result .roulette-item img{transform:translateY(12px)}
+
+
+/* New premium case-opening screen */
+#modal.case-opening{z-index:1000;background:rgba(4,5,13,.94);backdrop-filter:blur(14px);padding:12px;overflow-y:auto}
+#modal.case-opening .dialog{position:relative;width:min(100%,680px)!important;max-width:680px!important;min-height:0!important;margin:auto;padding:24px 18px 20px!important;border:1px solid #48416d;border-radius:28px;background:radial-gradient(ellipse at 50% 0%,#34305c 0%,#1b1c30 48%,#111321 100%);box-shadow:0 28px 90px #000b,0 0 45px #8064ff22;overflow:hidden}
+#modal.case-opening .close{z-index:5;right:14px;top:14px;width:38px;height:38px;border:1px solid #ffffff20;border-radius:50%;background:#ffffff12;font-size:24px}
+.opening-top{text-align:center;padding:8px 42px 18px}
+.opening-kicker{font-size:10px;letter-spacing:3px;font-weight:900;color:#a99aff}
+.opening-top h2{font-size:clamp(24px,6vw,34px);margin:9px 0 3px;color:#fff}
+.opening-top p{margin:0;color:#a7a8c2;font-size:13px}
+.opening-stage{height:clamp(190px,42vw,270px);position:relative;display:flex;align-items:center;overflow:hidden;border:1px solid #7463c866;border-radius:20px;background:linear-gradient(180deg,#111426,#1a1b30 52%,#101323);box-shadow:inset 0 0 45px #0009}
+.opening-glow{position:absolute;left:50%;top:50%;width:190px;height:190px;transform:translate(-50%,-50%);border-radius:50%;background:#8865ff2b;filter:blur(38px);pointer-events:none}
+.opening-stage #result{position:absolute;inset:0;width:100%;height:100%;min-height:0!important;padding:0!important;display:block;overflow:hidden}
+.opening-track{height:100%;width:max-content;display:flex;align-items:center;gap:0;will-change:transform;position:relative;z-index:1}
+#modal.case-opening .roulette-item{flex:0 0 120px!important;width:120px!important;height:130px!important;box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:12px;border:0;border-right:1px solid #ffffff0a;border-radius:0;background:transparent}
+#modal.case-opening .roulette-item img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 7px 9px #0008)}
+.opening-pointer{position:absolute;z-index:3;left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%);background:linear-gradient(180deg,transparent,#ffe17b 15%,#ffe17b 85%,transparent);box-shadow:0 0 14px #ffd75c}
+.opening-pointer:before,.opening-pointer:after{content:"";position:absolute;left:50%;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent}
+.opening-pointer:before{top:0;border-top:13px solid #ffe17b}
+.opening-pointer:after{bottom:0;border-bottom:13px solid #ffe17b}
+.opening-scan{position:absolute;z-index:2;inset:0;pointer-events:none;background:linear-gradient(90deg,#0e102000 0%,#0e1020aa 50%,#0e102000 100%)}
+.opening-status{display:flex;justify-content:center;align-items:center;gap:9px;margin:18px 0 8px;color:#aaa8d0;font-size:11px;font-weight:800;letter-spacing:1.5px}
+.opening-pulse{width:7px;height:7px;border-radius:50%;background:#9b83ff;box-shadow:0 0 12px #9b83ff;animation:opening-pulse 1s infinite alternate}
+@keyframes opening-pulse{to{opacity:.25;transform:scale(.65)}}
+.opening-won{color:#ffe17b;font-size:18px}
+.opening-drop-name{font-size:clamp(17px,4.5vw,23px);line-height:1.25;margin:8px 0;color:#fff;overflow-wrap:anywhere}
+.opening-drop-price{display:block;color:#b6a7ff;font-size:14px}
+#modal.case-opening .opening-claim{display:block;width:100%;margin:20px 0 0;padding:15px;border-radius:14px;background:linear-gradient(110deg,#8265ff,#5e49d5);font-size:15px;box-shadow:0 8px 25px #6552d444}
+#modal.case-opening .opening-claim:disabled{background:#34334b;color:#9291a8;box-shadow:none}
+.opening-footnote{margin-top:13px;color:#666984;font-size:10px}
+.opening-winner{height:100%;display:grid;place-items:center;animation:opening-winner .55s cubic-bezier(.2,1.5,.4,1) both}
+.opening-winner .reveal-image{width:min(72%,380px)!important;height:90%!important;max-width:380px!important;object-fit:contain;filter:drop-shadow(0 12px 22px #9b7cff66)}
+@keyframes opening-winner{from{opacity:0;transform:scale(.55) rotate(-8deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@media(max-width:480px){#modal.case-opening{padding:8px}#modal.case-opening .dialog{padding:20px 12px 16px!important;border-radius:22px}.opening-stage{height:205px}#modal.case-opening .roulette-item{flex-basis:105px!important;width:105px!important;height:118px!important}}
