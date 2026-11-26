@@ -45,36 +45,61 @@ function showOpening(crate){
  const modal=document.createElement('div');modal.className='modal';modal.id='case-opening-modal';
  modal.innerHTML='<div class="dialog"><button class="close" id="opening-close" aria-label="Закрыть">×</button><div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>'+escapeHTML(crate.name)+'</h2><p>Удачи! Посмотрим, что внутри.</p></div><div class="opening-stage"><div class="cs2-reel"><div class="cs2-reel-track" id="reel-track"></div></div><div class="opening-pointer"></div><div class="case-burst" id="case-burst"><i class="burst-ring"></i><div class="burst-box">📦</div><span>ОТКРЫВАЕМ КЕЙС</span></div></div><div class="opening-status" id="opening-status"><i class="opening-pulse"></i>ПОДГОТОВКА</div><div id="opening-result" class="hidden"><h3 class="opening-drop-name" id="opening-drop-name"></h3><b class="opening-drop-price" id="opening-drop-price"></b><button class="opening-claim" id="opening-claim">Забрать в инвентарь</button></div><div class="opening-footnote">Демо-режим · стоимость открытия '+money(CASE_PRICE)+'</div></div>';
  document.body.appendChild(modal);
- const close=()=>modal.remove();$('opening-close').onclick=close;
+ let closed=false,animation=null;
+ const close=()=>{closed=true;if(animation)animation.cancel();modal.remove()};
+ $('opening-close').onclick=close;
  modal.addEventListener('click',e=>{if(e.target===modal)close()});
  const winner=chooseDrop(crate);if(!winner){$('opening-status').textContent='В этом кейсе пока нет списка предметов.';return}
- const drops=getCaseDrops(crate);const track=$('reel-track'),winnerIndex=52;
+ const drops=getCaseDrops(crate),track=$('reel-track'),winnerIndex=52;
  const reel=Array.from({length:70},(_,i)=>i===winnerIndex?winner:drops[Math.floor(Math.random()*drops.length)]);
  track.innerHTML=reel.map(dropCard).join('');
  const status=$('opening-status'),burst=$('case-burst'),result=$('opening-result');
+ function revealWinner(){
+  if(closed||!modal.isConnected)return;
+  status.textContent='ВЫПАЛ ПРЕДМЕТ!';
+  $('opening-drop-name').textContent=winner.name;
+  $('opening-drop-price').textContent='≈ '+money(winner.price);
+  result.classList.remove('hidden');
+  const stage=modal.querySelector('.opening-stage');
+  stage.insertAdjacentHTML('beforeend','<div class="opening-winner">'+(winner.image?'<img class="reveal-image" src="'+escapeHTML(winner.image)+'" alt="'+escapeHTML(winner.name)+'" onerror="this.style.display=\'none\'">':'<span class="burst-box">🔫</span>')+'</div>');
+  track.children[winnerIndex].classList.add('is-winning');
+  $('opening-claim').onclick=()=>{inventory.push({...winner,icon:'🔫'});render();close()};
+ }
  window.setTimeout(()=>{
-  burst.classList.add('burst-out');status.innerHTML='<i class="opening-pulse"></i>РУЛЕТКА КРУТИТСЯ…';
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-   const stage=modal.querySelector('.opening-stage');
-   const winningCard=track.children[winnerIndex];
-   // Measure the real on-screen card position; offsetLeft is unreliable here
-   // because the reel track is inside several positioned/overflow containers.
-   track.style.transition='none';
-   track.style.transform='translate3d(0,0,0)';
-   void track.offsetWidth;
-   const stageRect=stage.getBoundingClientRect();
-   const cardRect=winningCard.getBoundingClientRect();
-   const targetX=(stageRect.left+stageRect.width/2)-(cardRect.left+cardRect.width/2);
-   track.style.transition='transform 5.8s cubic-bezier(.08,.72,.08,1)';
-   track.style.transform='translate3d('+targetX+'px,0,0)';
-  }));
-  window.setTimeout(()=>{
-   status.textContent='ВЫПАЛ ПРЕДМЕТ!';$('opening-drop-name').textContent=winner.name;$('opening-drop-price').textContent='≈ '+money(winner.price);
-   result.classList.remove('hidden');const stage=modal.querySelector('.opening-stage');
-   stage.insertAdjacentHTML('beforeend','<div class="opening-winner">'+(winner.image?'<img class="reveal-image" src="'+escapeHTML(winner.image)+'" alt="'+escapeHTML(winner.name)+'" onerror="this.style.display=\'none\'">':'<span class="burst-box">🔫</span>')+'</div>');
-   $('opening-claim').onclick=()=>{inventory.push({...winner,icon:'🔫'});render();close()};
-    track.children[winnerIndex].classList.add('is-winning');
-  },5700);
+  if(closed||!modal.isConnected)return;
+  burst.classList.add('burst-out');
+  status.innerHTML='<i class="opening-pulse"></i>РУЛЕТКА КРУТИТСЯ…';
+  requestAnimationFrame(()=>{
+   requestAnimationFrame(()=>{
+    if(closed||!modal.isConnected)return;
+    const stage=modal.querySelector('.opening-stage');
+    const winningCard=track.children[winnerIndex];
+    // Reset to the true starting point, then animate the actual reel element.
+    track.style.transform='translate3d(0px,0,0)';
+    const stageRect=stage.getBoundingClientRect();
+    const cardRect=winningCard.getBoundingClientRect();
+    const distance=(stageRect.left+stageRect.width/2)-(cardRect.left+cardRect.width/2);
+    const endTransform='translate3d('+distance+'px,0,0)';
+    if(typeof track.animate==='function'){
+     animation=track.animate(
+      [{transform:'translate3d(0px,0,0)'},{transform:endTransform}],
+      {duration:6500,easing:'cubic-bezier(.08,.72,.08,1)',fill:'forwards'}
+     );
+     animation.onfinish=()=>{
+      if(closed)return;
+      track.style.transform=endTransform;
+      animation.cancel();
+      revealWinner();
+     };
+    }else{
+     track.style.transition='none';
+     void track.offsetWidth;
+     track.style.transition='transform 6.5s cubic-bezier(.08,.72,.08,1)';
+     track.style.transform=endTransform;
+     window.setTimeout(()=>{track.style.transition='none';revealWinner()},6700);
+    }
+   });
+  });
  },800);
 }
 async function renderCaseCatalog(){
