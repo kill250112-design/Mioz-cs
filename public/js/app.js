@@ -57,8 +57,15 @@ function showOpening(crate){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
    const stage=modal.querySelector('.opening-stage');
    const winningCard=track.children[winnerIndex];
-   const targetX=stage.clientWidth/2-(winningCard.offsetLeft+winningCard.offsetWidth/2);
-   track.style.transition='transform 5.5s cubic-bezier(.08,.72,.08,1)';
+   // Measure the real on-screen card position; offsetLeft is unreliable here
+   // because the reel track is inside several positioned/overflow containers.
+   track.style.transition='none';
+   track.style.transform='translate3d(0,0,0)';
+   void track.offsetWidth;
+   const stageRect=stage.getBoundingClientRect();
+   const cardRect=winningCard.getBoundingClientRect();
+   const targetX=(stageRect.left+stageRect.width/2)-(cardRect.left+cardRect.width/2);
+   track.style.transition='transform 5.8s cubic-bezier(.08,.72,.08,1)';
    track.style.transform='translate3d('+targetX+'px,0,0)';
   }));
   window.setTimeout(()=>{
