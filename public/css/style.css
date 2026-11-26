@@ -201,18 +201,3 @@ button:focus-visible{
 .bottom-nav [data-page="inventory"] i{position:absolute;top:3px;right:calc(50% - 27px);min-width:15px;height:15px;padding:0 4px;border-radius:8px;background:#f3c45d;color:#211707;font-size:8px;font-style:normal;font-weight:950;line-height:15px}
 @media(min-width:650px){.inventory-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.inventory-card-art{height:160px}.inventory-card-info{padding:13px}.inventory-card h3{font-size:13px}}
 @media(max-width:380px){.inventory-stats{gap:5px}.inventory-stat{padding:10px 7px}.inventory-stat span{font-size:7px}.inventory-toolbar button{font-size:8px;padding:8px 7px}.inventory-card-art{height:108px}}
-
-/* Case detail probability menu */
-.case-detail{animation:inventoryEnter .25s ease both}
-.case-detail h2{margin:10px 0 4px;font-size:22px}
-.case-detail .detail-art img{width:100%;height:100%;padding:10px}
-.case-detail .odds-title{margin:22px 0 10px;color:#f4cf7b;font-size:13px;letter-spacing:1px}
-.contents-row{min-height:48px;border:1px solid #2c3d57}
-.contents-row>span{min-width:0}
-.contents-row .odds-rarity{color:#e6c77e;font-size:10px}
-.contents-row .skin-image{flex:0 0 44px;width:44px;height:38px;object-fit:contain}
-.skin-name{font-size:10px;line-height:1.3}
-.contents-row> b{white-space:nowrap;color:#f4cf7b;font-variant-numeric:tabular-nums}
-.detail-open{display:block;margin:14px auto 0;padding:12px 18px}
-.skin-image-fallback{display:inline-grid;flex:0 0 44px;width:44px;height:38px;place-items:center;font-size:22px}
-@media(max-width:520px){.contents-list{gap:6px}.contents-row{padding:7px;font-size:10px}.case-detail{padding:12px}.case-detail .detail-art{height:145px}}
