@@ -1,20 +1,13 @@
-let balance=1000,inventory=[],caseCatalog=[];
+let balance=1000,caseCatalog=[];
 const CASE_PRICE=100;
-try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)&&Array.isArray(saved.inventory)){balance=Math.max(0,saved.balance);inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)&&typeof x.icon==='string')}}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance)}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
-function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
+function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance}))}catch(e){}}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
-function skinImage(name){return 'https://raw.githubusercontent.com/renzynx/cs2-assets/main/static/panorama/images/econ/default_generated/'+name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_light_png.png'}
-function itemVisual(x){return '<img class="skin-image" src="'+escapeHTML(x.image||skinImage(x.name))+'" alt="'+escapeHTML(x.name)+'" onerror="this.remove();this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+(x.icon||'🔫')+'</span>'}
 function render(){
- saveGame();$('balance').textContent=money(balance);
- $('home-inventory-count').textContent=inventory.length;
- $('recent-drop').textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет предметов';
- $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="case"><div class="art">'+itemVisual(x)+'</div><h3>'+escapeHTML(x.name)+'</h3><b class="price">'+money(x.price)+'</b><button data-sell="'+i+'">Продать</button></article>').join(''):'<p class="muted">Инвентарь пока пуст.</p>';
- document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
+ saveGame();
+ $('balance').textContent=money(balance);
 }
-$('home-inventory').onclick=()=>document.getElementById('inventory').scrollIntoView({behavior:'smooth',block:'start'});
-$('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 render();
 
 const CASES_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
@@ -43,7 +36,7 @@ function chooseDrop(crate){
 function dropCard(drop){return '<div class="cs2-reel-item"><div class="cs2-reel-art">'+(drop.image?'<img class="cs2-reel-image" src="'+escapeHTML(drop.image)+'" alt="" onerror="this.style.display=\'none\'">':'<span class="skin-fallback">🔫</span>')+'</div><b>'+escapeHTML(drop.name)+'</b></div>'}
 function showOpening(crate){
  const modal=document.createElement('div');modal.className='modal';modal.id='case-opening-modal';
- modal.innerHTML='<div class="dialog"><button class="close" id="opening-close" aria-label="Закрыть">×</button><div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>'+escapeHTML(crate.name)+'</h2><p>Удачи! Посмотрим, что внутри.</p></div><div class="opening-stage"><div class="cs2-reel"><div class="cs2-reel-track" id="reel-track"></div></div><div class="opening-pointer"></div><div class="case-burst" id="case-burst"><i class="burst-ring"></i><div class="burst-box">📦</div><span>ОТКРЫВАЕМ КЕЙС</span></div></div><div class="opening-status" id="opening-status"><i class="opening-pulse"></i>ПОДГОТОВКА</div><div id="opening-result" class="hidden"><h3 class="opening-drop-name" id="opening-drop-name"></h3><b class="opening-drop-price" id="opening-drop-price"></b><button class="opening-claim" id="opening-claim">Забрать в инвентарь</button></div><div class="opening-footnote">Демо-режим · стоимость открытия '+money(CASE_PRICE)+'</div></div>';
+ modal.innerHTML='<div class="dialog"><button class="close" id="opening-close" aria-label="Закрыть">×</button><div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>'+escapeHTML(crate.name)+'</h2><p>Удачи! Посмотрим, что внутри.</p></div><div class="opening-stage"><div class="cs2-reel"><div class="cs2-reel-track" id="reel-track"></div></div><div class="opening-pointer"></div><div class="case-burst" id="case-burst"><i class="burst-ring"></i><div class="burst-box">📦</div><span>ОТКРЫВАЕМ КЕЙС</span></div></div><div class="opening-status" id="opening-status"><i class="opening-pulse"></i>ПОДГОТОВКА</div><div id="opening-result" class="hidden"><h3 class="opening-drop-name" id="opening-drop-name"></h3><b class="opening-drop-price" id="opening-drop-price"></b><button class="opening-claim" id="opening-claim">Завершить</button></div><div class="opening-footnote">Демо-режим · стоимость открытия '+money(CASE_PRICE)+'</div></div>';
  document.body.appendChild(modal);
  let closed=false,animation=null;
  const close=()=>{closed=true;if(animation)animation.cancel();modal.remove()};
@@ -56,6 +49,7 @@ function showOpening(crate){
  const status=$('opening-status'),burst=$('case-burst'),result=$('opening-result');
  function revealWinner(){
   if(closed||!modal.isConnected)return;
+  render();saveGame();
   status.textContent='ВЫПАЛ ПРЕДМЕТ!';
   $('opening-drop-name').textContent=winner.name;
   $('opening-drop-price').textContent='≈ '+money(winner.price);
@@ -63,7 +57,7 @@ function showOpening(crate){
   const stage=modal.querySelector('.opening-stage');
   stage.insertAdjacentHTML('beforeend','<div class="opening-winner">'+(winner.image?'<img class="reveal-image" src="'+escapeHTML(winner.image)+'" alt="'+escapeHTML(winner.name)+'" onerror="this.style.display=\'none\'">':'<span class="burst-box">🔫</span>')+'</div>');
   track.children[winnerIndex].classList.add('is-winning');
-  $('opening-claim').onclick=()=>{inventory.push({...winner,icon:'🔫'});render();close()};
+  $('opening-claim').onclick=close;
  }
  window.setTimeout(()=>{
   if(closed||!modal.isConnected)return;
