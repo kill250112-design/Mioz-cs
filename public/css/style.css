@@ -491,3 +491,18 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 #modal.case-opening .opening-pointer{z-index:5}
 #modal.case-opening .opening-scan{display:none!important}
 @media(max-width:480px){#modal.case-opening .roulette-item{flex-basis:104px!important;width:104px!important;height:142px!important}#modal.case-opening .roulette-icon{font-size:44px!important}#modal.case-opening .roulette-item img{height:100px}}
+
+
+/* Final case-opening reel: clear artwork, visible fallback and a strong spin */
+#modal.case-opening .opening-stage{height:clamp(220px,48vw,290px)!important;isolation:isolate;background:radial-gradient(ellipse at center,#302b50 0%,#191b30 68%,#101323 100%)!important}
+#modal.case-opening .opening-stage #result{z-index:2!important;overflow:hidden!important}
+#modal.case-opening .opening-track{display:flex!important;align-items:center!important;height:100%!important;width:max-content!important;gap:8px!important;padding:0 12px!important;will-change:transform;transform:translate3d(0,0,0)}
+#modal.case-opening .roulette-item{position:relative!important;flex:0 0 126px!important;width:126px!important;height:174px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;margin:0!important;padding:12px 8px 28px!important;overflow:hidden!important;border:1px solid #8c7ed066!important;border-radius:16px!important;background:linear-gradient(155deg,#343451,#1a1d32)!important;box-shadow:inset 0 1px #ffffff18,0 8px 18px #0005!important}
+#modal.case-opening .roulette-item img{position:relative!important;z-index:2!important;display:block!important;width:100%!important;height:118px!important;object-fit:contain!important;filter:drop-shadow(0 8px 9px #000b)!important}
+#modal.case-opening .roulette-icon{position:absolute!important;z-index:1!important;inset:0!important;display:grid!important;place-items:center!important;color:#e7e0ff!important;font-size:58px!important;font-style:normal!important;background:radial-gradient(circle at 50% 42%,#51466f,#27283f 72%)!important}
+#modal.case-opening .roulette-label{position:absolute!important;z-index:3!important;bottom:7px!important;left:5px!important;right:5px!important;display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;text-align:center!important;color:#f1efff!important;font-size:9px!important;font-weight:800!important;text-shadow:0 2px 5px #000!important}
+#modal.case-opening .opening-pointer{z-index:6!important;width:3px!important;box-shadow:0 0 14px #ffd75c,0 0 28px #ffd75c99!important}
+#modal.case-opening .opening-scan{display:none!important}
+#modal.case-opening .opening-status{margin-top:20px!important}
+#modal.case-opening .opening-winner{min-height:210px}
+@media(max-width:480px){#modal.case-opening .opening-stage{height:225px!important}#modal.case-opening .roulette-item{flex-basis:108px!important;width:108px!important;height:158px!important}#modal.case-opening .roulette-item img{height:105px!important}#modal.case-opening .roulette-icon{font-size:48px!important}}
