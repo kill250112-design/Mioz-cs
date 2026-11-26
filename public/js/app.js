@@ -40,7 +40,27 @@ async function loadCases(){
   const order=['Dreams & Nightmares Case','Revolution Case','Kilowatt Case','Gallery Case','Fever Case'];
   cases.sort((a,b)=>order.indexOf(a.name)-order.indexOf(b.name));
   render();
- }catch(e){console.error('Не удалось загрузить каталог кейсов CS2',e)}
+ }catch(e){
+  console.error('Не удалось загрузить каталог кейсов CS2',e);
+  const fallback=[
+   ['Dreams & Nightmares Case','🌙',41],
+   ['Revolution Case','🔥',7],
+   ['Kilowatt Case','⚡',4],
+   ['Gallery Case','🎨',32],
+   ['Fever Case','💗',28]
+  ];
+  cases=fallback.map(([name,icon,price],i)=>({
+   id:'fallback-case-'+i,name,icon,image:'',price,
+   drops:[
+    ['★ Нож / редкий предмет','🔪',12000,0.2,''],
+    ['AWP | Элитное снаряжение','🎯',1800,4.8,''],
+    ['AK-47 | Красная линия','🔫',950,10,''],
+    ['M4A4 | Император','🦅',420,25,''],
+    ['Glock-18 | Лунная ночь','🌙',90,60,'']
+   ]
+  }));
+  render();
+ }
 }
 
 let balance=1000,inventory=[],rolling=false,pending=null,expandedCase=null;
