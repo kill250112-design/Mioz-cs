@@ -8,7 +8,7 @@ function skinImage(name){return 'https://raw.githubusercontent.com/renzynx/cs2-a
 function itemVisual(x){return '<img class="skin-image" src="'+escapeHTML(x.image||skinImage(x.name))+'" alt="'+escapeHTML(x.name)+'" onerror="this.remove();this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+(x.icon||'🔫')+'</span>'}
 function render(){
  saveGame();$('balance').textContent=money(balance);
- $('home-inventory-count').textContent=inventory.length;
+ if($('home-inventory-count')) $('home-inventory-count').textContent=inventory.length;
  $('recent-drop').textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет предметов';
  $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="case"><div class="art">'+itemVisual(x)+'</div><h3>'+escapeHTML(x.name)+'</h3><b class="price">'+money(x.price)+'</b><button data-sell="'+i+'">Продать</button></article>').join(''):'<p class="muted">Инвентарь пока пуст.</p>';
  document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
