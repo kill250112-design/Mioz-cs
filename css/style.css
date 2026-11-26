@@ -2,7 +2,7 @@
 
 /* Case opening roulette */
 .case{transition:transform .18s,border-color .18s}.case:hover{transform:translateY(-3px);border-color:#7658ed}
-button:disabled{opacity:.45;cursor:not-allowed}.spin-track{display:flex;align-items:center;gap:12px;white-space:nowrap;width:max-content;font-size:62px;animation:roulette 2.8s cubic-bezier(.08,.72,.12,1) forwards}.spin-track span{display:grid;place-items:center;width:82px;height:92px;background:#292b40;border-radius:14px}
+button:disabled{opacity:.45;cursor:not-allowed}.spin-track{display:flex;align-items:center;gap:0;white-space:nowrap;width:max-content;font-size:62px;animation:roulette 2.8s cubic-bezier(.08,.72,.12,1) forwards}.spin-track span{display:grid;place-items:center;width:82px;height:92px;background:#292b40;border-radius:14px}
 @keyframes roulette{from{transform:translateX(0)}to{transform:translateX(-850px)}}
 #result{overflow:hidden;max-width:100%;min-height:110px;display:flex;justify-content:center;align-items:center}
 
