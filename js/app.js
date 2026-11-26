@@ -82,31 +82,40 @@ function openCase(id){
   '<button id="claim" class="opening-claim" disabled>Крутится...</button>'+
   '<div class="opening-footnote">Результат определяется шансами предметов</div>';
  $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
- const targetIndex=34,total=42;
+ const targetIndex=36,total=44;
  const items=Array.from({length:total},(_,i)=>i===targetIndex?pending:chooseDrop(c));
  $('result').innerHTML='<div class="opening-track">'+items.map(x=>'<span class="roulette-item"><i class="roulette-icon">'+(x[1]||'◆')+'</i><img src="'+(x[4]||skinImage(x[0]))+'" alt="'+x[0]+'" loading="eager" onerror="this.style.display=\'none\'"><b class="roulette-label">'+x[0]+'</b></span>').join('')+'</div>';
  const track=$('result').querySelector('.opening-track');
  const reel=$('result');
- requestAnimationFrame(()=>{
-  const card=track.querySelector('.roulette-item');
-  const cardWidth=card.offsetWidth||120;
-  const offset=Math.round(reel.getBoundingClientRect().width/2-(targetIndex*cardWidth+cardWidth/2));
-  track.style.transition='none';
-  track.style.transform='translate3d(0,0,0)';
-  track.getBoundingClientRect();
-  requestAnimationFrame(()=>{
-   track.style.transition='transform 6.2s cubic-bezier(.08,.72,.12,1)';
-   track.style.transform='translate3d('+offset+'px,0,0)';
-  });
- });
- setTimeout(()=>{
+ let finished=false;
+ const finishSpin=()=>{
+  if(finished)return;
+  finished=true;
   rolling=false;
   $('result').innerHTML='<div class="opening-winner">'+itemVisual(pending,'reveal-image')+'</div>';
   $('openingStatus').innerHTML='<span class="opening-won">★</span> ПРЕДМЕТ ВЫПАЛ';
   $('dropName').textContent=pending[0];
   $('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс: '+formatChance(pending[3]);
   $('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;
- },6000);
+ };
+ requestAnimationFrame(()=>{
+  const first=track.querySelector('.roulette-item');
+  const style=getComputedStyle(track);
+  const gap=parseFloat(style.columnGap||style.gap)||0;
+  const target=track.children[targetIndex];
+  const reelCenter=reel.getBoundingClientRect().width/2;
+  const targetCenter=target.offsetLeft+target.getBoundingClientRect().width/2;
+  const offset=Math.round(reelCenter-targetCenter);
+  track.style.transition='none';
+  track.style.transform='translate3d(0,0,0)';
+  track.getBoundingClientRect();
+  requestAnimationFrame(()=>{
+   track.style.transition='transform 7.2s cubic-bezier(.08,.72,.12,1)';
+   track.style.transform='translate3d('+offset+'px,0,0)';
+   track.addEventListener('transitionend',e=>{if(e.propertyName==='transform')finishSpin()},{once:true});
+  });
+ });
+ setTimeout(finishSpin,7800);
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
