@@ -1,152 +1,16 @@
-let cases=[];
-const CASE_API='https://bymykel.github.io/CSGO-API/api/en/crates.json';
-const CASE_PRICES_USD={
-'Fever Case':0.35,'Gallery Case':0.40,'Kilowatt Case':0.05,'Revolution Case':0.08,'Recoil Case':0.12,'Dreams & Nightmares Case':0.51,'Snakebite Case':0.19,'Fracture Case':0.20,'Clutch Case':0.26,'Prisma 2 Case':0.60,'Prisma Case':0.55,'Danger Zone Case':0.62,'Horizon Case':0.89,'Spectrum 2 Case':2,'Spectrum Case':2.40,'Gamma 2 Case':1.99,'Gamma Case':2,'Chroma 3 Case':2.19,'Chroma 2 Case':2.55,'Chroma Case':3.34,'Glove Case':6.03,'Operation Hydra Case':19,'Operation Broken Fang Case':3.94,'Operation Riptide Case':4.49,'Operation Wildfire Case':1.88,'Operation Breakout Weapon Case':5.39,'Operation Phoenix Weapon Case':2.49,'Operation Vanguard Weapon Case':3.26,'Operation Bravo Case':46.46,'CS:GO Weapon Case':80.99,'CS:GO Weapon Case 2':14.77,'CS:GO Weapon Case 3':9.84,'eSports 2013 Case':35.54,'eSports 2013 Winter Case':8.67,'eSports 2014 Summer Case':8.50,'Winter Offensive Weapon Case':8.20,'Huntsman Weapon Case':6.31,'Falchion Case':1,'Shadow Case':1.02,'Revolver Case':1.80,'Shattered Web Case':2.90,'CS20 Case':0.49
-};
-const USD_RUB=80;
-const rarityWeight=r=>({'Mil-Spec Grade':79.92,'Restricted':15.98,'Classified':3.2,'Covert':0.64}[r]||0.26);
-// Ориентировочные цены предметов в рублях: целые числа, одинаковые для одного и того же скина.
-function itemMarketPrice(name,rarity){
- const ranges={'Mil-Spec Grade':[15,180],'Restricted':[70,650],'Classified':[250,2200],'Covert':[900,9000],'Special':[2500,30000]};
- const [min,max]=ranges[rarity]||ranges.Special;
- let hash=0;for(let i=0;i<name.length;i++)hash=(hash*31+name.charCodeAt(i))>>>0;
- return Math.round((min+(hash%10000)/9999*(max-min))/1)*1;
-}
-async function loadCases(){
- try{
-  const response=await fetch(CASE_API);if(!response.ok)throw new Error('API');
-  const data=await response.json();
-  cases=data.filter(c=>c.type==='Case'&&Array.isArray(c.contains)&&c.contains.length).map((c,i)=>{
-   const regular=c.contains.map(x=>[x.name,'',itemMarketPrice(x.name,x.rarity?.name),rarityWeight(x.rarity?.name),(x.image||''),x.rarity?.color]);
-   const rare=(c.contains_rare||[]).map(x=>[x.name,'',itemMarketPrice(x.name,'Special'),0.26,x.image,'#e4ae39']);
-   const drops=[...regular,...rare];
-   // Шансы рассчитываются по цене: чем дороже предмет, тем ниже его вероятность.
-   // Распределяем 100% с точностью до миллионной доли процента, чтобы сумма была ровно 100%.
-   const weights=drops.map(d=>1/Math.sqrt(Math.max(1,d[2])));
-   const weightTotal=weights.reduce((s,w)=>s+w,0);
-   const units=100000000;
-   const shares=weights.map(w=>w/weightTotal*units);
-   const assigned=shares.map(Math.floor);
-   let remainder=units-assigned.reduce((s,n)=>s+n,0);
-   const priority=shares.map((v,i)=>({i,f:v-Math.floor(v)})).sort((a,b)=>b.f-a.f);
-   for(let i=0;i<remainder;i++)assigned[priority[i].i]++;
-   drops.forEach((d,i)=>d[3]=assigned[i]/1000000);
-   // В списке кейса дорогие скины сверху, дешёвые снизу.
-   drops.sort((a,b)=>b[2]-a[2]);
-   const usd=CASE_PRICES_USD[c.name];
-   return {id:'case-'+c.id,name:c.name,price:100,icon:'',image:(c.image||''),drops};
-  });
-  cases.sort((a,b)=>a.name.localeCompare(b.name));
-  render();
- }catch(e){
-  console.error('Не удалось загрузить каталог кейсов CS2',e);
-  const fallback=[['Dreams & Nightmares Case','🌙'],['Revolution Case','🔥'],['Kilowatt Case','⚡'],['Gallery Case','🎨'],['Fever Case','💗']];
-  cases=fallback.map(([name,icon],i)=>({
-   id:'fallback-case-'+i,name,icon,image:'',price:100,
-   drops:[
-    ['★ Нож / редкий предмет','🔪',12000,0.2,''],
-    ['AWP | Элитное снаряжение','🎯',1800,4.8,''],
-    ['AK-47 | Красная линия','🔫',950,10,''],
-    ['M4A4 | Император','🦅',420,25,''],
-    ['Glock-18 | Лунная ночь','🌙',90,60,'']
-   ]
-  }));
-  render();
- }
-}
-
-let balance=1000,inventory=[],rolling=false,pending=null,expandedCase=null;
+let balance=1000,inventory=[];
 try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)&&Array.isArray(saved.inventory)){balance=Math.max(0,saved.balance);inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)&&typeof x.icon==='string')}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
-function formatChance(value){return Math.round(value)+'%';}
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
-function skinImage(name){const wear=name.includes('Karambit')||name.includes('Bayonet')||name.includes('Butterfly Knife')?'Factory New':'Field-Tested';return 'https://raw.githubusercontent.com/renzynx/cs2-assets/main/static/panorama/images/econ/default_generated/'+name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_light_png.png'}
-function itemVisual(d,cls='skin-image'){return '<img class="'+cls+'" src="'+(d[4]||skinImage(d[0]))+'" alt="'+d[0]+'" loading="eager" onerror="this.remove();this.nextElementSibling.style.setProperty(\'display\',\'grid\',\'important\')"><span class="skin-fallback" style="display:none">'+(d[1]||'🔫')+'</span>'}
-function chooseDrop(c){let roll=Math.random()*100;for(const d of c.drops){roll-=d[3];if(roll<0)return d}return c.drops[c.drops.length-1]}
+function skinImage(name){return 'https://raw.githubusercontent.com/renzynx/cs2-assets/main/static/panorama/images/econ/default_generated/'+name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_light_png.png'}
+function itemVisual(x){return '<img class="skin-image" src="'+skinImage(x.name)+'" alt="'+x.name+'" onerror="this.remove();this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+(x.icon||'🔫')+'</span>'}
 function render(){
  saveGame();$('balance').textContent=money(balance);
- const count=$('home-inventory-count');if(count)count.textContent=inventory.length;
- const recent=$('recent-drop');if(recent)recent.textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет дропов';
- $('cases').setAttribute('aria-live','polite');$('inventory').setAttribute('aria-live','polite');
- const selected=cases.find(c=>c.id===expandedCase);
- const sortedDrops=selected?[...selected.drops].sort((a,b)=>Number(b[2])-Number(a[2])):[];
- $('cases').innerHTML=selected?`<section class="case-detail"><button class="detail-back" data-back>← Все кейсы</button><div class="detail-art">${selected.image?`<img src="${selected.image}" alt="${selected.name}" style="width:100%;height:100%;object-fit:contain" onerror="this.style.display=\'none\'">`:selected.icon}</div><h2>${selected.name}</h2><p class="muted">Стоимость открытия: ${money(selected.price)}</p><button type="button" class="open detail-open" data-open="${selected.id}">Открыть · ${money(selected.price)}</button><h3 class="odds-title">Содержимое кейса и шансы</h3><div class="case-contents"><div class="contents-list">${sortedDrops.map(d=>`<div class="contents-row"><span>${itemVisual(d)} <span class="skin-name">${d[0]}</span></span><b>Шанс: ${formatChance(d[3])}</b><small>Цена предмета: ${money(d[2])}</small></div>`).join('')}</div></div></section>`:cases.map(c=>`<article class="case case-tile" data-case="${c.id}"><div class="art">${c.image?`<img src="${c.image}" alt="${c.name}" style="width:100%;height:100%;object-fit:contain">`:c.icon}</div><h3>${c.name}</h3><p class="muted">Содержит ${c.drops.length} возможных предметов</p><b class="price">${money(c.price)}</b><button class="open" data-case="${c.id}">Посмотреть кейс</button></article>`).join('');
- $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>`<article class="case"><div class="art">${itemVisual([x.name,x.icon,x.price,0])}</div><h3>${x.name}</h3><b class="price">${money(x.price)}</b><button data-sell="${i}">Продать</button></article>`).join(''):'<p class="muted">Инвентарь пуст — открой кейс!</p>';
- document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>{expandedCase=b.dataset.case;render()});
- document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openCase(b.dataset.open));
- document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{expandedCase=null;render()});
+ $('home-inventory-count').textContent=inventory.length;
+ $('recent-drop').textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет предметов';
+ $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="case"><div class="art">'+itemVisual(x)+'</div><h3>'+x.name+'</h3><b class="price">'+money(x.price)+'</b><button data-sell="'+i+'">Продать</button></article>').join(''):'<p class="muted">Инвентарь пока пуст.</p>';
  document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
 }
-function openCase(id){
- if(rolling)return;
- const c=cases.find(x=>x.id===id);if(!c)return;
- if(balance<c.price){alert('Недостаточно монет для открытия кейса.');return;}
- balance-=c.price;rolling=true;pending=chooseDrop(c);saveGame();$('balance').textContent=money(balance);
- const modal=$('modal');modal.classList.remove('hidden');modal.classList.add('case-opening');
- const dialog=modal.querySelector('.dialog');
- dialog.innerHTML='<button id="close" class="close" aria-label="Закрыть" disabled>×</button>'+
- '<div class="opening-top"><span class="opening-kicker">CS2 • CASE OPENING</span><h2>Открытие кейса</h2><p>'+c.name+'</p></div>'+
- '<div class="opening-stage cs2-reel-stage"><div class="case-burst" id="caseBurst"><div class="burst-ring"></div><div class="burst-box">📦</div><span>ГОТОВИМ ОТКРЫТИЕ</span></div><div class="opening-pointer"></div><div id="result" class="cs2-reel"></div></div>'+
- '<div class="opening-status" id="openingStatus"><span class="opening-pulse"></span> ЗАГРУЖАЕМ СКИНЫ...</div>'+
- '<h2 id="dropName" class="opening-drop-name">Рулетка скоро начнётся</h2><b id="dropPrice" class="opening-drop-price"></b>'+
- '<button id="claim" class="opening-claim" disabled>Идёт открытие...</button><div class="opening-footnote">Предмет под золотым указателем — твой выигрыш</div>';
- const closeBtn=$('close'),claimBtn=$('claim'),status=$('openingStatus'),result=$('result');
- closeBtn.onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1]||'🔫',price:pending[2]});pending=null;}modal.classList.add('hidden');modal.classList.remove('case-opening');render()};
- claimBtn.onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1]||'🔫',price:pending[2]});pending=null;modal.classList.add('hidden');modal.classList.remove('case-opening');render()};
- const winnerIndex=64,items=Array.from({length: winnerIndex+12},()=>chooseDrop(c));items[winnerIndex]=pending;
- const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
- result.innerHTML='<div class="cs2-reel-track">'+items.map((d,i)=>'<div class="cs2-reel-item" data-index="'+i+'"><div class="cs2-reel-art">'+itemVisual(d,'cs2-reel-image')+'</div><b>'+esc(d[0])+'</b></div>').join('')+'</div>';
- const track=result.querySelector('.cs2-reel-track'),stage=modal.querySelector('.cs2-reel-stage');
- const finish=()=>{
-  if(!rolling)return;
-  rolling=false;
-  result.innerHTML='<div class="opening-winner">'+itemVisual(pending,'reveal-image')+'</div>';
-  status.innerHTML='<span class="opening-won">★</span> ВЫИГРЫШ';
-  $('dropName').textContent=pending[0];
-  $('dropPrice').textContent='Цена предмета: '+money(pending[2]);
-  claimBtn.textContent='Забрать предмет';claimBtn.disabled=false;closeBtn.disabled=false;
- };
- const spin=()=>{
-  const burst=$('caseBurst');if(burst)burst.classList.add('burst-out');
-  const target=track.querySelector('[data-index="'+winnerIndex+'"]');if(!target){finish();return;}
-  track.style.transition='none';track.style.transform='translate3d(0,0,0)';
-  // Measure after layout so the winner is aligned to the exact pointer center.
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-   const stageBox=stage.getBoundingClientRect(),itemBox=target.getBoundingClientRect();
-   const distance=itemBox.left+itemBox.width/2-(stageBox.left+stageBox.width/2);
-   status.innerHTML='<span class="opening-pulse"></span> КРУТИМ РУЛЕТКУ...';
-   track.getBoundingClientRect();
-   track.style.transition='transform 11.5s cubic-bezier(.055,.72,.08,1)';
-   track.style.transform='translate3d('+(-distance)+'px,0,0)';
-   let done=false;
-   const complete=()=>{if(done)return;done=true;finish()};
-   track.addEventListener('transitionend',e=>{if(e.propertyName==='transform')complete()},{once:true});
-   // Fallback for browsers that skip transitionend when a tab is backgrounded.
-   setTimeout(complete,11900);
-  }));
- };
- const images=[...track.querySelectorAll('img')];
- const ready=images.map(img=>new Promise(resolve=>{
-  if(img.complete){resolve();return}
-  const timer=setTimeout(resolve,1800);
-  img.addEventListener('load',()=>{clearTimeout(timer);resolve()},{once:true});
-  img.addEventListener('error',()=>{clearTimeout(timer);resolve()},{once:true});
- }));
- Promise.all(ready).then(()=>setTimeout(spin,900));
-}
-$('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
-$('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
-function showTab(tab){
- document.querySelectorAll('.bottom-nav [data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
- $('cases').classList.toggle('hidden',tab!=='cases');$('inventory').classList.toggle('hidden',tab!=='inventory');
- $('home-dashboard').classList.toggle('hidden',tab!=='cases');
- document.querySelector('.cases-heading').classList.toggle('hidden',tab!=='cases');
- if(tab==='cases'||tab==='inventory')render();
-}
-document.querySelectorAll('.bottom-nav [data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
-$('logo-home')?.addEventListener('click',()=>showTab('cases'));
-$('home-inventory').onclick=()=>showTab('inventory');
+$('home-inventory').onclick=()=>document.getElementById('inventory').scrollIntoView({behavior:'smooth',block:'start'});
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 render();
-
-loadCases();
