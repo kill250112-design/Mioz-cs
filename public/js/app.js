@@ -81,59 +81,25 @@ function openCase(id){
  if(rolling)return;
  const c=cases.find(x=>x.id===id);if(!c)return;
  if(balance<c.price){alert('Недостаточно монет для открытия кейса. Пополни баланс.');return;}
- balance-=c.price;rolling=true;pending=chooseDrop(c);
- saveGame();$('balance').textContent=money(balance);
- $('modal').classList.remove('hidden');
- $('modal').classList.add('case-opening');
- $('modal').querySelector('.dialog').innerHTML=
+ balance-=c.price;rolling=true;pending=chooseDrop(c);saveGame();$('balance').textContent=money(balance);
+ const modal=$('modal');modal.classList.remove('hidden');modal.classList.add('case-opening');
+ modal.querySelector('.dialog').innerHTML=
   '<button id="close" class="close" aria-label="Закрыть">×</button>'+
-  '<div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>Открываем кейс</h2><p>'+c.name+'</p></div>'+
-  '<div class="opening-stage"><div class="opening-glow"></div><div class="opening-pointer"></div><div id="result" class="drop opening-reel"></div><div class="opening-scan"></div></div>'+
-  '<div class="opening-status" id="openingStatus"><span class="opening-pulse"></span> Ищем твой дроп...</div>'+
+  '<div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>Открытие кейса</h2><p>'+c.name+'</p></div>'+
+  '<div class="opening-stage cs2-reel-stage"><div class="opening-glow"></div><div class="opening-pointer"></div><div id="result" class="cs2-reel"></div></div>'+
+  '<div class="opening-status" id="openingStatus"><span class="opening-pulse"></span> КЕЙС ОТКРЫВАЕТСЯ...</div>'+
   '<h2 id="dropName" class="opening-drop-name">Удачи!</h2><b id="dropPrice" class="opening-drop-price"></b>'+
-  '<button id="claim" class="opening-claim" disabled>Крутится...</button>'+
-  '<div class="opening-footnote">Результат определяется шансами предметов</div>';
- $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
- const pool=c.items||c.skins||[];
- const reelItems=Array.from({length:36},()=>chooseDrop(c));
- reelItems.push(pending);
- $('result').innerHTML='<div class="flip-opening"><div class="flip-orbit orbit-a"></div><div class="flip-orbit orbit-b"></div><div class="flip-card" id="flipCard"><div class="flip-art" id="flipArt"></div><div class="flip-card-info"><span class="flip-rarity" id="flipRarity">CS2 DROP</span><b id="flipName">Поиск предмета...</b></div></div><div class="flip-light"></div></div>';
- const card=$('flipCard');
- let finished=false,step=0,timer=null;
- const finishFlip=()=>{
-  if(finished)return;
-  finished=true;
-  if(timer)clearTimeout(timer);
-  rolling=false;
-  $('result').innerHTML='<div class="opening-winner">'+itemVisual(pending,'reveal-image')+'</div>';
-  $('openingStatus').innerHTML='<span class="opening-won">★</span> ПРЕДМЕТ ВЫПАЛ';
-  $('dropName').textContent=pending[0];
-  $('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс: '+formatChance(pending[3]);
-  $('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;
- };
- const showFlipItem=(item)=>{
-  const art=$('flipArt');
-  art.innerHTML=itemVisual(item,'flip-skin-image');
-  $('flipName').textContent=item[0];
-  $('flipRarity').textContent='CS2 • '+(item[3]!==undefined?formatChance(item[3]):'DROP');
-  card.classList.remove('flip-turn');
-  void card.offsetWidth;
-  card.classList.add('flip-turn');
- };
- const spinStep=()=>{
-  if(finished)return;
-  const item=step>=reelItems.length-1?pending:reelItems[step];
-  showFlipItem(item);
-  step++;
-  if(step>=reelItems.length){timer=setTimeout(finishFlip,850);return;}
-  const progress=step/reelItems.length;
-  const delay=75+Math.pow(progress,3)*330;
-  timer=setTimeout(spinStep,delay);
- };
- $('openingStatus').innerHTML='<span class="opening-pulse"></span> КЕЙС ОТКРЫВАЕТСЯ...';
- spinStep();
- setTimeout(finishFlip,12500);
+  '<button id="claim" class="opening-claim" disabled>Открываем...</button><div class="opening-footnote">Анимация открытия • результат выбран случайно</div>';
+ $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}modal.classList.add('hidden')};
+ const all=Array.from({length:48},()=>chooseDrop(c));const winnerIndex=42;all[winnerIndex]=pending;
+ const cell=(d,i)=>'<div class="cs2-reel-item" data-index="'+i+'"><div class="cs2-reel-art">'+itemVisual(d,'cs2-reel-image')+'</div><b>'+d[0]+'</b></div>';
+ $('result').innerHTML='<div class="cs2-reel-track">'+all.map(cell).join('')+'</div>';
+ const track=modal.querySelector('.cs2-reel-track'),stage=modal.querySelector('.cs2-reel-stage');
+ const finish=()=>{if(!rolling)return;rolling=false;const result=$('result');result.innerHTML='<div class="opening-winner">'+itemVisual(pending,'reveal-image')+'</div>';$('openingStatus').innerHTML='<span class="opening-won">★</span> ПРЕДМЕТ ВЫПАЛ';$('dropName').textContent=pending[0];$('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс: '+formatChance(pending[3]);$('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;};
+ const spin=()=>{const target=track.children[winnerIndex];if(!target)return;const center=stage.clientWidth/2;const offset=target.offsetLeft+target.offsetWidth/2-center;track.style.transition='none';track.style.transform='translateX(0)';requestAnimationFrame(()=>requestAnimationFrame(()=>{track.style.transition='transform 7.2s cubic-bezier(.08,.72,.08,1)';track.style.transform='translateX(-'+offset+'px)';}));setTimeout(finish,7600);};
+ const imgs=[...track.querySelectorAll('img')];Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,1800)}))).then(spin);
 }
+
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
 function showTab(tab){
