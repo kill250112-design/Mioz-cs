@@ -120,14 +120,27 @@ async function renderCaseCatalog(){
 renderCaseCatalog();
 
 
-// Отдельные страницы разделов с адресами #home, #cases и #inventory.
+// Нижняя навигация: переключение разделов по нажатию.
 function navigatePage(page){
- const allowed=['home','cases','inventory'];if(!allowed.includes(page))page='home';
- document.querySelectorAll('.page-view').forEach(el=>el.classList.toggle('active',el.id==='page-'+page));
- document.querySelectorAll('[data-page]').forEach(el=>{const active=el.dataset.page===page;el.classList.toggle('active',active);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current')});
- if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
- window.scrollTo({top:0,behavior:'smooth'});
+ const allowed=['home','cases','inventory'];
+ if(!allowed.includes(page)) page='home';
+ document.querySelectorAll('.page-view').forEach(section=>{
+  section.classList.toggle('active',section.id==='page-'+page);
+ });
+ document.querySelectorAll('.bottom-nav [data-page]').forEach(button=>{
+  const active=button.dataset.page===page;
+  button.classList.toggle('active',active);
+  if(active) button.setAttribute('aria-current','page');
+  else button.removeAttribute('aria-current');
+ });
+ if(location.hash!=='#'+page) history.replaceState(null,'','#'+page);
+ window.scrollTo({top:0,behavior:'auto'});
 }
-document.querySelectorAll('[data-page]').forEach(button=>button.addEventListener('click',()=>navigatePage(button.dataset.page)));
+document.addEventListener('click',event=>{
+ const button=event.target.closest('.bottom-nav [data-page]');
+ if(!button)return;
+ event.preventDefault();
+ navigatePage(button.dataset.page);
+});
 window.addEventListener('hashchange',()=>navigatePage(location.hash.slice(1)));
 navigatePage(location.hash.slice(1)||'home');
