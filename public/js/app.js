@@ -14,3 +14,36 @@ function render(){
 $('home-inventory').onclick=()=>document.getElementById('inventory').scrollIntoView({behavior:'smooth',block:'start'});
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 render();
+renderCaseCatalog();
+
+const CASES_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
+const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+async function renderCaseCatalog(){
+ const grid=$('case-catalog-grid'),count=$('case-count');
+ if(!grid||!count)return;
+ try{
+  const response=await fetch(CASES_API,{cache:'no-cache'});
+  if(!response.ok)throw new Error('Не удалось загрузить каталог');
+  const data=await response.json();
+  const cases=data.filter(item=>item&&item.type==='Case'&&/case/i.test(item.name||''))
+   .sort((a,b)=>String(b.first_sale_date||'').localeCompare(String(a.first_sale_date||'')));
+  if(!cases.length)throw new Error('Список кейсов пока недоступен');
+  count.textContent=cases.length+' кейсов';
+  grid.innerHTML=cases.map((item,index)=>`
+   <article class="case-catalog-card">
+    <div class="case-catalog-art">
+     <img src="${escapeHTML(item.image||'')}" alt="${escapeHTML(item.name)}" loading="${index<6?'eager':'lazy'}"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+     <span class="case-image-fallback" aria-hidden="true">📦</span>
+    </div>
+    <div class="case-catalog-info">
+     <h3>${escapeHTML(item.name)}</h3>
+     <span>${item.first_sale_date?new Date(item.first_sale_date+'T00:00:00').toLocaleDateString('ru-RU'):'CS2'}</span>
+    </div>
+   </article>`).join('');
+ }catch(error){
+  count.textContent='Каталог недоступен';
+  grid.innerHTML='<p class="case-catalog-loading">Не получилось загрузить картинки кейсов. Проверь подключение к интернету и обнови страницу.</p>';
+  console.error('CS2 case catalog:',error);
+ }
+}
