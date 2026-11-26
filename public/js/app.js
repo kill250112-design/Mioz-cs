@@ -80,39 +80,59 @@ function render(){
 function openCase(id){
  if(rolling)return;
  const c=cases.find(x=>x.id===id);if(!c)return;
- if(balance<c.price){alert('Недостаточно монет для открытия кейса. Пополни баланс.');return;}
+ if(balance<c.price){alert('Недостаточно монет для открытия кейса.');return;}
  balance-=c.price;rolling=true;pending=chooseDrop(c);saveGame();$('balance').textContent=money(balance);
  const modal=$('modal');modal.classList.remove('hidden');modal.classList.add('case-opening');
  const dialog=modal.querySelector('.dialog');
- dialog.innerHTML=
-  '<button id="close" class="close" aria-label="Закрыть">×</button>'+
-  '<div class="opening-top"><span class="opening-kicker">CS2 • CASE UNLOCK</span><h2>Открываем кейс</h2><p>'+c.name+'</p></div>'+
-  '<div class="opening-stage cs2-reel-stage"><div class="case-burst" id="caseBurst"><div class="burst-ring"></div><div class="burst-box">📦</div><span>ПОДГОТОВКА К ОТКРЫТИЮ</span></div><div class="opening-pointer"></div><div id="result" class="cs2-reel"></div></div>'+
-  '<div class="opening-status" id="openingStatus"><span class="opening-pulse"></span> ГОТОВИМ РУЛЕТКУ...</div>'+
-  '<h2 id="dropName" class="opening-drop-name">Сейчас узнаем, что внутри</h2><b id="dropPrice" class="opening-drop-price"></b>'+
-  '<button id="claim" class="opening-claim" disabled>Открываем...</button><div class="opening-footnote">Следи за указателем — он остановится на твоём предмете</div>';
- $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1]||'🔫',price:pending[2]});pending=null;render()}modal.classList.add('hidden');modal.classList.remove('case-opening')};
- $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1]||'🔫',price:pending[2]});pending=null;modal.classList.add('hidden');modal.classList.remove('case-opening');render()};
- const all=Array.from({length:64},()=>chooseDrop(c));const winnerIndex=54;all[winnerIndex]=pending;
- const cell=(d,i)=>'<div class="cs2-reel-item" data-index="'+i+'"><div class="cs2-reel-art">'+itemVisual(d,'cs2-reel-image')+'</div><b>'+d[0]+'</b></div>';
- $('result').innerHTML='<div class="cs2-reel-track">'+all.map(cell).join('')+'</div>';
- const track=modal.querySelector('.cs2-reel-track'),stage=modal.querySelector('.cs2-reel-stage');
- const finish=()=>{if(!rolling)return;rolling=false;$('result').innerHTML='<div class="opening-winner">'+itemVisual(pending,'reveal-image')+'</div>';$('openingStatus').innerHTML='<span class="opening-won">★</span> ВАШ ДРОП';$('dropName').textContent=pending[0];$('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс: '+formatChance(pending[3]);$('claim').textContent='Забрать предмет';$('claim').disabled=false;};
- const showReel=()=>{
+ dialog.innerHTML='<button id="close" class="close" aria-label="Закрыть" disabled>×</button>'+
+ '<div class="opening-top"><span class="opening-kicker">CS2 • CASE OPENING</span><h2>Открытие кейса</h2><p>'+c.name+'</p></div>'+
+ '<div class="opening-stage cs2-reel-stage"><div class="case-burst" id="caseBurst"><div class="burst-ring"></div><div class="burst-box">📦</div><span>ГОТОВИМ ОТКРЫТИЕ</span></div><div class="opening-pointer"></div><div id="result" class="cs2-reel"></div></div>'+
+ '<div class="opening-status" id="openingStatus"><span class="opening-pulse"></span> ЗАГРУЖАЕМ СКИНЫ...</div>'+
+ '<h2 id="dropName" class="opening-drop-name">Рулетка скоро начнётся</h2><b id="dropPrice" class="opening-drop-price"></b>'+
+ '<button id="claim" class="opening-claim" disabled>Идёт открытие...</button><div class="opening-footnote">Предмет под золотым указателем — твой выигрыш</div>';
+ const closeBtn=$('close'),claimBtn=$('claim'),status=$('openingStatus'),result=$('result');
+ closeBtn.onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1]||'🔫',price:pending[2]});pending=null;}modal.classList.add('hidden');modal.classList.remove('case-opening');render()};
+ claimBtn.onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1]||'🔫',price:pending[2]});pending=null;modal.classList.add('hidden');modal.classList.remove('case-opening');render()};
+ const winnerIndex=64,items=Array.from({length: winnerIndex+12},()=>chooseDrop(c));items[winnerIndex]=pending;
+ const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+ result.innerHTML='<div class="cs2-reel-track">'+items.map((d,i)=>'<div class="cs2-reel-item" data-index="'+i+'"><div class="cs2-reel-art">'+itemVisual(d,'cs2-reel-image')+'</div><b>'+esc(d[0])+'</b></div>').join('')+'</div>';
+ const track=result.querySelector('.cs2-reel-track'),stage=modal.querySelector('.cs2-reel-stage');
+ const finish=()=>{
+  if(!rolling)return;
+  rolling=false;
+  result.innerHTML='<div class="opening-winner">'+itemVisual(pending,'reveal-image')+'</div>';
+  status.innerHTML='<span class="opening-won">★</span> ВЫИГРЫШ';
+  $('dropName').textContent=pending[0];
+  $('dropPrice').textContent='Цена предмета: '+money(pending[2]);
+  claimBtn.textContent='Забрать предмет';claimBtn.disabled=false;closeBtn.disabled=false;
+ };
+ const spin=()=>{
   const burst=$('caseBurst');if(burst)burst.classList.add('burst-out');
-  const target=track.children[winnerIndex];if(!target)return;
+  const target=track.querySelector('[data-index="'+winnerIndex+'"]');if(!target){finish();return;}
   track.style.transition='none';track.style.transform='translate3d(0,0,0)';
+  // Measure after layout so the winner is aligned to the exact pointer center.
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-   const stageRect=stage.getBoundingClientRect(),targetRect=target.getBoundingClientRect();
-   const offset=targetRect.left+targetRect.width/2-(stageRect.left+stageRect.width/2);
-   track.style.transition='transform 9.5s cubic-bezier(.08,.68,.08,1)';
-   track.style.transform='translate3d('+(-offset)+'px,0,0)';
-   $('openingStatus').innerHTML='<span class="opening-pulse"></span> КРУТИМ РУЛЕТКУ...';
-   setTimeout(finish,9900);
+   const stageBox=stage.getBoundingClientRect(),itemBox=target.getBoundingClientRect();
+   const distance=itemBox.left+itemBox.width/2-(stageBox.left+stageBox.width/2);
+   status.innerHTML='<span class="opening-pulse"></span> КРУТИМ РУЛЕТКУ...';
+   track.getBoundingClientRect();
+   track.style.transition='transform 11.5s cubic-bezier(.055,.72,.08,1)';
+   track.style.transform='translate3d('+(-distance)+'px,0,0)';
+   let done=false;
+   const complete=()=>{if(done)return;done=true;finish()};
+   track.addEventListener('transitionend',e=>{if(e.propertyName==='transform')complete()},{once:true});
+   // Fallback for browsers that skip transitionend when a tab is backgrounded.
+   setTimeout(complete,11900);
   }));
  };
- const imgs=[...track.querySelectorAll('img')];
- Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.addEventListener('load',resolve,{once:true});img.addEventListener('error',resolve,{once:true});setTimeout(resolve,2200)}))).then(()=>setTimeout(showReel,1500));
+ const images=[...track.querySelectorAll('img')];
+ const ready=images.map(img=>new Promise(resolve=>{
+  if(img.complete){resolve();return}
+  const timer=setTimeout(resolve,1800);
+  img.addEventListener('load',()=>{clearTimeout(timer);resolve()},{once:true});
+  img.addEventListener('error',()=>{clearTimeout(timer);resolve()},{once:true});
+ }));
+ Promise.all(ready).then(()=>setTimeout(spin,900));
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
