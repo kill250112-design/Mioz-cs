@@ -47,7 +47,7 @@ $('topup').onclick=()=>alert('Это демо-версия: реальные п�
 render();
 
 const CASES_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
-const rarityWeights={'Mil-Spec Grade':79.92,'Industrial Grade':79.92,'Consumer Grade':79.92,'Restricted':15.98,'Classified':3.2,'Covert':0.64,'Extraordinary':0.26};
+const rarityWeights={'Mil-Spec Grade':79.92,'Restricted':15.98,'Classified':3.2,'Covert':0.64,'Extraordinary':0.26};
 const rarityPrices={'Consumer Grade':[8,22],'Industrial Grade':[20,55],'Mil-Spec Grade':[45,120],'Restricted':[100,260],'Classified':[220,650],'Covert':[600,1800],'Extraordinary':[2500,9000]};
 function normalizeDrop(item){
  const rarity=item.rarity||item.rarity_name||{},rarityName=typeof rarity==='string'?rarity:(rarity.name||rarity.localized_name||'Mil-Spec Grade');
@@ -56,7 +56,7 @@ function normalizeDrop(item){
 function getCaseDrops(crate){
  const normal=Array.isArray(crate.contains)?crate.contains:[];
  const rare=Array.isArray(crate.contains_rare)?crate.contains_rare:[];
- return [...normal,...rare].filter(x=>x&&x.name).map(normalizeDrop);
+ return [...normal.map(normalizeDrop),...rare.filter(x=>x&&x.name).map(x=>({...normalizeDrop(x),rarity:'Extraordinary'}))];
 }
 function chooseDrop(crate){
  const normal=(crate.contains||[]).filter(x=>x&&x.name).map(normalizeDrop);
