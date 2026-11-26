@@ -1,36 +1,21 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#191c30">
-<title>CS2 — Кейсы</title>
-<link rel="stylesheet" href="./css/style.css?v=94">
-<script type="module" src="./js/app.js?v=94"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090c14"><title>CS2 — Кейсы</title>
+<link rel="stylesheet" href="./css/style.css?v=95"><script type="module" src="./js/app.js?v=95"></script>
 </head>
 <body>
-<header class="topbar">
-  <b class="logo" id="logo-home">CS<span>2</span><i> CASES</i></b>
-  <div class="top-actions"><div class="balance-pill"><span>💰</span><strong id="balance">1 000 ₽</strong></div><button class="topup" id="topup">Пополнить</button></div>
-</header>
+<header class="topbar"><b class="logo" id="logo-home">CS<span>2</span><i>CASES</i></b><div class="top-actions"><div class="balance-pill"><span>💰</span><strong id="balance">1 000 ₽</strong></div><button class="topup" id="topup">Пополнить</button></div></header>
 <main>
-  <section id="home-dashboard" class="home-dashboard">
-    <div class="info-strip">
-      <article class="info-card top-drop"><small>ТОП ДРОП</small><strong>Керамбит | Fade</strong><span>💎 52 000 ₽</span></article>
-      <article class="info-card recent-drop"><small>НЕДАВНИЙ ДРОП</small><strong id="recent-drop">Пока нет дропов</strong><span>🕒 Последняя удача</span></article>
-    </div>
-    <button class="feature-card inventory-feature" id="home-inventory"><span class="feature-icon">🎒</span><span class="feature-copy"><strong>ИНВЕНТАРЬ</strong><small>Скинов: <b id="home-inventory-count">0</b></small></span></button>
-  </section>
-  <section class="hero">
-    <div class="hero-copy"><small>ТВОЯ УДАЧА — ТВОЙ ДРОП</small><h1>Открывай кейсы.<br><em>Забирай скины.</em></h1><p>Выбирай кейс и испытай удачу!</p></div>
-    <div class="hero-art" aria-hidden="true"><span class="hero-gem">💎</span><span class="hero-box">🎁</span><span class="hero-spark">✦</span></div>
-  </section>
-  <div class="cases-heading"><h2>КЕЙСЫ</h2><span>Выбирай и открывай</span></div>
-<section id="cases" class="grid"></section>
-  <section id="inventory" class="grid hidden"></section>
-
+<section id="home-dashboard" class="home-dashboard">
+<div class="info-strip"><article class="info-card top-drop"><small>ТОП ДРОП</small><strong>Керамбит | Fade</strong><span>💎 52 000 ₽</span></article><article class="info-card recent-drop"><small>ПОСЛЕДНИЙ ДРОП</small><strong id="recent-drop">Пока нет дропов</strong><span>✦ Твоя последняя удача</span></article></div>
+<button class="inventory-feature" id="home-inventory"><span class="feature-icon">🎒</span><span class="feature-copy"><strong>ИНВЕНТАРЬ</strong><small>Предметов: <b id="home-inventory-count">0</b></small></span></button>
+</section>
+<section class="hero"><div class="hero-copy"><small>CS2 CASE OPENING</small><h1>Открывай кейсы.<br><em>Лови редкий дроп.</em></h1><p>Выбирай кейс, смотри содержимое и испытывай удачу.</p></div><div class="hero-art" aria-hidden="true"><span class="hero-gem">💎</span><span class="hero-box">📦</span><span class="hero-spark">✦</span></div></section>
+<div class="cases-heading"><h2>КЕЙСЫ</h2><span>Выбери свой дроп</span></div><section id="cases" class="grid"></section><section id="inventory" class="grid hidden"></section>
+</main>
 <nav class="bottom-nav" aria-label="Навигация"><button data-tab="cases" class="active"><span>📦</span>Кейсы</button><button data-tab="inventory"><span>🎒</span>Инвентарь</button></nav>
 <div id="modal" class="modal hidden"><div class="dialog"><button id="close" class="close">×</button><small>ТВОЙ ДРОП</small><div id="result" class="drop">🎁</div><h2 id="dropName"></h2><b id="dropPrice"></b><button id="claim">Забрать</button></div></div>
-<footer>Демо-симулятор CS2. Цены кейсов ориентировочные, пересчитаны из USD в рубли.</footer>
-</body>
-</html>
+<footer>Демо-симулятор CS2. Виртуальный баланс и предметы сохраняются на этом устройстве.</footer>
+</body></html>
