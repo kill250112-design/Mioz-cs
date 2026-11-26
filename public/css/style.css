@@ -449,7 +449,7 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 .opening-pointer:before,.opening-pointer:after{content:"";position:absolute;left:50%;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent}
 .opening-pointer:before{top:0;border-top:13px solid #ffe17b}
 .opening-pointer:after{bottom:0;border-bottom:13px solid #ffe17b}
-.opening-scan{position:absolute;z-index:2;inset:0;pointer-events:none;background:linear-gradient(90deg,#0e102000 0%,#0e1020aa 50%,#0e102000 100%)}
+.opening-scan{position:absolute;z-index:2;inset:0;pointer-events:none;background:linear-gradient(90deg,#10132366 0%,transparent 12%,transparent 88%,#10132366 100%)}
 .opening-status{display:flex;justify-content:center;align-items:center;gap:9px;margin:18px 0 8px;color:#aaa8d0;font-size:11px;font-weight:800;letter-spacing:1.5px}
 .opening-pulse{width:7px;height:7px;border-radius:50%;background:#9b83ff;box-shadow:0 0 12px #9b83ff;animation:opening-pulse 1s infinite alternate}
 @keyframes opening-pulse{to{opacity:.25;transform:scale(.65)}}
@@ -463,3 +463,8 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 .opening-winner .reveal-image{width:min(72%,380px)!important;height:90%!important;max-width:380px!important;object-fit:contain;filter:drop-shadow(0 12px 22px #9b7cff66)}
 @keyframes opening-winner{from{opacity:0;transform:scale(.55) rotate(-8deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 @media(max-width:480px){#modal.case-opening{padding:8px}#modal.case-opening .dialog{padding:20px 12px 16px!important;border-radius:22px}.opening-stage{height:205px}#modal.case-opening .roulette-item{flex-basis:105px!important;width:105px!important;height:118px!important}}
+
+/* Keep the moving reel clearly visible through the entire spin */
+#modal.case-opening .opening-stage #result{z-index:1}
+#modal.case-opening .opening-track{opacity:1;filter:drop-shadow(0 0 8px #9277ff22)}
+#modal.case-opening .opening-scan{z-index:2;background:linear-gradient(90deg,#10132366 0%,transparent 12%,transparent 88%,#10132366 100%)}
