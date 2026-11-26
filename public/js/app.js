@@ -8,7 +8,27 @@ function render(){
  saveGame();
  $('balance').textContent=money(balance);
 }
-$('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
+$('topup').onclick=()=>{
+ const amounts=[100,500,1000,5000,10000,100000];
+ const modal=document.createElement('div');
+ modal.className='modal topup-modal';
+ modal.innerHTML='<div class="dialog topup-dialog"><button class="close" type="button" aria-label="Закрыть">×</button><div class="topup-heading"><span>CS2 · БАЛАНС</span><h2>Пополнение баланса</h2><p>Выбери сумму — она сразу начислится на твой баланс</p></div><div class="topup-amounts">'+amounts.map(amount=>'<button type="button" class="topup-amount" data-amount="'+amount+'"><span>＋</span>'+amount.toLocaleString('ru-RU')+' ₽</button>').join('')+'</div><p class="topup-demo-note">Демо-режим · реальные платежи не используются</p></div>';
+ document.body.appendChild(modal);
+ const close=()=>modal.remove();
+ modal.querySelector('.close').onclick=close;
+ modal.addEventListener('click',event=>{if(event.target===modal)close()});
+ modal.querySelectorAll('[data-amount]').forEach(button=>button.onclick=()=>{
+  const amount=Number(button.dataset.amount);
+  balance+=amount;
+  render();
+  close();
+  const notice=document.createElement('div');
+  notice.className='balance-toast';
+  notice.textContent='+'+money(amount)+' начислено на баланс';
+  document.body.appendChild(notice);
+  window.setTimeout(()=>notice.remove(),2200);
+ });
+};
 render();
 
 const CASES_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
