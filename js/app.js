@@ -75,7 +75,7 @@ function openCase(id){
  $('result').innerHTML='<div class="roulette-marker"></div><div class="spin-track">'+items.map(x=>'<span class="roulette-item"><img src="'+(x[4]||skinImage(x[0]))+'" alt="'+x[0]+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><i style="display:none">'+x[1]+'</i></span>').join('')+'</div>';
  const track=$('result').querySelector('.spin-track');track.style.animation='none';track.style.transition='none';track.style.transform='translateX(0)';
  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-  const card=track.querySelector('span'),step=card.getBoundingClientRect().width+12;
+  const card=track.querySelector('span'),step=card.getBoundingClientRect().width;
   const offset=$('result').clientWidth/2-(targetIndex*step+card.getBoundingClientRect().width/2);
   track.style.transition='transform 4.2s cubic-bezier(.08,.72,.12,1)';
   track.style.transform='translateX('+offset+'px)';
