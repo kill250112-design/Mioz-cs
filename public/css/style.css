@@ -506,3 +506,27 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 #modal.case-opening .opening-status{margin-top:20px!important}
 #modal.case-opening .opening-winner{min-height:210px}
 @media(max-width:480px){#modal.case-opening .opening-stage{height:225px!important}#modal.case-opening .roulette-item{flex-basis:108px!important;width:108px!important;height:158px!important}#modal.case-opening .roulette-item img{height:105px!important}#modal.case-opening .roulette-icon{font-size:48px!important}}
+
+
+/* Completely new case opening: animated 3D item reveal, no roulette strip */
+#modal.case-opening .opening-stage{height:clamp(300px,78vw,390px)!important;min-height:300px!important;display:grid!important;place-items:center!important;overflow:hidden!important;background:radial-gradient(ellipse at 50% 48%,#34305d 0%,#1a1b31 52%,#0d1020 100%)!important;border:1px solid #7867b477!important}
+#modal.case-opening .opening-stage #result{position:absolute!important;inset:0!important;z-index:3!important;display:grid!important;place-items:center!important;overflow:hidden!important}
+#modal.case-opening .opening-pointer,#modal.case-opening .opening-scan{display:none!important}
+.flip-opening{position:relative;width:100%;height:100%;display:grid;place-items:center;perspective:1000px;isolation:isolate}
+.flip-orbit{position:absolute;width:245px;height:245px;border:1px solid #a28bff35;border-radius:50%;box-shadow:0 0 35px #8d70ff18,inset 0 0 30px #8d70ff12;animation:flip-orbit 7s linear infinite}
+.flip-orbit:before,.flip-orbit:after{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:#c5aaff;box-shadow:0 0 18px #b59aff}
+.flip-orbit:before{top:22px;left:35px}.flip-orbit:after{right:18px;bottom:48px}
+.flip-orbit.orbit-b{width:295px;height:185px;transform:rotate(-28deg);animation-direction:reverse;border-color:#ffcf6b33}
+.flip-light{position:absolute;width:175px;height:175px;border-radius:50%;background:#9475ff44;filter:blur(55px);animation:flip-glow 1.4s ease-in-out infinite alternate}
+.flip-card{position:relative;z-index:4;width:min(62%,230px);height:245px;border:1px solid #b4a1ff88;border-radius:22px;background:linear-gradient(145deg,#383653,#1a1d32 70%);box-shadow:0 22px 55px #0009,inset 0 1px #ffffff2b;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:15px;transform-style:preserve-3d;backface-visibility:hidden}
+.flip-card.flip-turn{animation:flip-turn .42s cubic-bezier(.2,.75,.25,1)}
+.flip-art{width:100%;height:165px;display:grid;place-items:center;overflow:hidden}
+.flip-art img,.flip-art .flip-skin-image{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;filter:drop-shadow(0 10px 12px #000b)!important}
+.flip-card-info{width:100%;display:flex;flex-direction:column;align-items:center;gap:9px;margin-top:9px;text-align:center}
+.flip-rarity{font-size:9px;letter-spacing:2px;font-weight:900;color:#b8a6ff}
+.flip-card-info b{max-width:100%;font-size:13px;color:#fff;overflow-wrap:anywhere}
+@keyframes flip-turn{0%{transform:rotateY(0) scale(1)}45%{transform:rotateY(88deg) scale(.88)}55%{transform:rotateY(92deg) scale(.88)}100%{transform:rotateY(0) scale(1)}}
+@keyframes flip-orbit{to{transform:rotate(360deg)}}
+@keyframes flip-glow{to{opacity:.5;transform:scale(1.25)}}
+#modal.case-opening .opening-winner{min-height:250px}
+@media(max-width:480px){#modal.case-opening .opening-stage{height:320px!important}.flip-card{width:66%;height:235px}.flip-art{height:155px}.flip-orbit{width:220px;height:220px}.flip-orbit.orbit-b{width:260px;height:165px}}
