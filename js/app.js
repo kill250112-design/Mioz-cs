@@ -82,15 +82,16 @@ function openCase(id){
   '<button id="claim" class="opening-claim" disabled>Крутится...</button>'+
   '<div class="opening-footnote">Результат определяется шансами предметов</div>';
  $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
- const targetIndex=36,total=44;
- const items=Array.from({length:total},(_,i)=>i===targetIndex?pending:chooseDrop(c));
- $('result').innerHTML='<div class="opening-track">'+items.map(x=>'<span class="roulette-item"><i class="roulette-icon">'+(x[1]||'◆')+'</i><img src="'+(x[4]||skinImage(x[0]))+'" alt="'+x[0]+'" loading="eager" onerror="this.style.display=\'none\'"><b class="roulette-label">'+x[0]+'</b></span>').join('')+'</div>';
- const track=$('result').querySelector('.opening-track');
- const reel=$('result');
- let finished=false;
- const finishSpin=()=>{
+ const pool=c.items||c.skins||[];
+ const reelItems=Array.from({length:36},()=>chooseDrop(c));
+ reelItems.push(pending);
+ $('result').innerHTML='<div class="flip-opening"><div class="flip-orbit orbit-a"></div><div class="flip-orbit orbit-b"></div><div class="flip-card" id="flipCard"><div class="flip-art" id="flipArt"></div><div class="flip-card-info"><span class="flip-rarity" id="flipRarity">CS2 DROP</span><b id="flipName">Поиск предмета...</b></div></div><div class="flip-light"></div></div>';
+ const card=$('flipCard');
+ let finished=false,step=0,timer=null;
+ const finishFlip=()=>{
   if(finished)return;
   finished=true;
+  if(timer)clearTimeout(timer);
   rolling=false;
   $('result').innerHTML='<div class="opening-winner">'+itemVisual(pending,'reveal-image')+'</div>';
   $('openingStatus').innerHTML='<span class="opening-won">★</span> ПРЕДМЕТ ВЫПАЛ';
@@ -98,24 +99,28 @@ function openCase(id){
   $('dropPrice').textContent='Цена: '+money(pending[2])+' · шанс: '+formatChance(pending[3]);
   $('claim').textContent='Забрать в инвентарь';$('claim').disabled=false;
  };
- requestAnimationFrame(()=>{
-  const first=track.querySelector('.roulette-item');
-  const style=getComputedStyle(track);
-  const gap=parseFloat(style.columnGap||style.gap)||0;
-  const target=track.children[targetIndex];
-  const reelCenter=reel.getBoundingClientRect().width/2;
-  const targetCenter=target.offsetLeft+target.getBoundingClientRect().width/2;
-  const offset=Math.round(reelCenter-targetCenter);
-  track.style.transition='none';
-  track.style.transform='translate3d(0,0,0)';
-  track.getBoundingClientRect();
-  requestAnimationFrame(()=>{
-   track.style.transition='transform 7.2s cubic-bezier(.08,.72,.12,1)';
-   track.style.transform='translate3d('+offset+'px,0,0)';
-   track.addEventListener('transitionend',e=>{if(e.propertyName==='transform')finishSpin()},{once:true});
-  });
- });
- setTimeout(finishSpin,7800);
+ const showFlipItem=(item)=>{
+  const art=$('flipArt');
+  art.innerHTML=itemVisual(item,'flip-skin-image');
+  $('flipName').textContent=item[0];
+  $('flipRarity').textContent='CS2 • '+(item[3]!==undefined?formatChance(item[3]):'DROP');
+  card.classList.remove('flip-turn');
+  void card.offsetWidth;
+  card.classList.add('flip-turn');
+ };
+ const spinStep=()=>{
+  if(finished)return;
+  const item=step>=reelItems.length-1?pending:reelItems[step];
+  showFlipItem(item);
+  step++;
+  if(step>=reelItems.length){timer=setTimeout(finishFlip,850);return;}
+  const progress=step/reelItems.length;
+  const delay=75+Math.pow(progress,3)*330;
+  timer=setTimeout(spinStep,delay);
+ };
+ $('openingStatus').innerHTML='<span class="opening-pulse"></span> КЕЙС ОТКРЫВАЕТСЯ...';
+ spinStep();
+ setTimeout(finishFlip,12500);
 }
 $('claim').onclick=()=>{if(!pending||rolling)return;inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;$('modal').classList.add('hidden');render()};
 $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
