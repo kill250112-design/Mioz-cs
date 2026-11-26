@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090c14"><title>CS2</title>
-<link rel="stylesheet" href="./css/style.css?v=117"><script type="module" src="./js/app.js?v=117"></script>
+<link rel="stylesheet" href="./css/style.css?v=118"><script type="module" src="./js/app.js?v=118"></script>
 </head>
 <body>
 <header class="topbar"><b class="logo" id="logo-home">CS<span>2</span></b><div class="top-actions"><div class="balance-pill"><span>💰</span><strong id="balance">1 000 ₽</strong></div></div></header>
@@ -16,8 +16,10 @@
   <div class="cases-heading"><h2>КЕЙСЫ CS2</h2><span id="case-count">Загрузка кейсов…</span></div>
   <div class="case-catalog-grid" id="case-catalog-grid"><div class="case-catalog-loading">Загружаем каталог CS2…</div></div>
 </section>
+<section id="inventory-page" class="inventory-page hidden"><div class="inventory-heading"><div><h2>МОЙ ИНВЕНТАРЬ</h2><p>Предметы, которые ты забрал из кейсов</p></div><span id="inventory-count">0 предметов</span></div><div id="inventory-grid" class="inventory-grid"></div></section>
 
 </main>
+<nav class="bottom-nav" aria-label="Навигация"><button class="active" data-page="cases"><span>📦</span>Кейсы</button><button data-page="inventory"><span>🎒</span>Инвентарь</button></nav>
 
 <footer>Демо-игра CS2. Виртуальный баланс сохраняется на этом устройстве.</footer>
 </body></html>
