@@ -84,7 +84,7 @@ function openCase(id){
  $('close').onclick=()=>{if(rolling)return;if(pending){inventory.push({name:pending[0],icon:pending[1],price:pending[2]});pending=null;render()}$('modal').classList.add('hidden')};
  const targetIndex=34,total=42;
  const items=Array.from({length:total},(_,i)=>i===targetIndex?pending:chooseDrop(c));
- $('result').innerHTML='<div class="opening-track">'+items.map(x=>'<span class="roulette-item"><img src="'+(x[4]||skinImage(x[0]))+'" alt="'+x[0]+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><i style="display:none">'+x[1]+'</i></span>').join('')+'</div>';
+ $('result').innerHTML='<div class="opening-track">'+items.map(x=>'<span class="roulette-item"><img src="'+(x[4]||skinImage(x[0]))+'" alt="'+x[0]+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><i class="roulette-fallback" style="display:none">'+x[1]+'</i><strong>'+x[0]+'</strong></span>').join('')+'</div>';
  const track=$('result').querySelector('.opening-track');
  const reel=$('result');
  requestAnimationFrame(()=>{
