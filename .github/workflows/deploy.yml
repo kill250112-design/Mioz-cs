@@ -17,7 +17,7 @@ concurrency:
 jobs:
   deploy:
     environment:
-      name: cs2-site
+      name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
@@ -31,7 +31,10 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: public
+          name: cs2-site
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: cs2-site
