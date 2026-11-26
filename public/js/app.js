@@ -8,41 +8,7 @@ function render(){
  saveGame();
  $('balance').textContent=money(balance);
 }
-let activeTopup=null;
-function closeTopup(){
- if(!activeTopup)return;
- const {popover,outsideHandler,escapeHandler}=activeTopup;
- document.removeEventListener('pointerdown',outsideHandler,true);
- document.removeEventListener('keydown',escapeHandler);
- popover.remove();
- activeTopup=null;
-}
-$('topup').onclick=event=>{
- event.stopPropagation();
- closeTopup();
- const amounts=[100,500,1000,5000,10000,100000];
- const popover=document.createElement('div');
- popover.className='topup-popover';
- popover.setAttribute('role','dialog');
- popover.setAttribute('aria-label','Выбор суммы пополнения');
- popover.innerHTML='<div class="topup-popover-title">Выбери сумму</div><div class="topup-popover-grid">'+amounts.map(amount=>'<button type="button" class="topup-popover-amount" data-amount="'+amount+'">'+amount.toLocaleString('ru-RU')+' ₽</button>').join('')+'</div><div class="topup-popover-note">Нажми на сумму — она сразу добавится</div>';
- document.body.appendChild(popover);
- const rect=$('topup').getBoundingClientRect();
- const width=Math.min(280,window.innerWidth-24);
- popover.style.width=width+'px';
- popover.style.top=Math.min(rect.bottom+8,window.innerHeight-popover.offsetHeight-12)+'px';
- popover.style.right=Math.max(12,window.innerWidth-rect.right)+'px';
- const outsideHandler=pointerEvent=>{
-  if(!popover.contains(pointerEvent.target)&&!$('topup').contains(pointerEvent.target))closeTopup();
- };
- const escapeHandler=keyEvent=>{if(keyEvent.key==='Escape')closeTopup()};
- activeTopup={popover,outsideHandler,escapeHandler};
- document.addEventListener('pointerdown',outsideHandler,true);
- document.addEventListener('keydown',escapeHandler);
- popover.querySelectorAll('[data-amount]').forEach(button=>button.onclick=()=>{
-  const amount=Number(button.dataset.amount);
-  balance+=amount;
-  render();
+render();
   closeTopup();
   const notice=document.createElement('div');
   notice.className='balance-toast';
