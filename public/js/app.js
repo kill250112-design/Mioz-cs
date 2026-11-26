@@ -7,14 +7,14 @@ function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&'
 function skinImage(name){return 'https://raw.githubusercontent.com/renzynx/cs2-assets/main/static/panorama/images/econ/default_generated/'+name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_light_png.png'}
 function itemVisual(x){return '<img class="skin-image" src="'+escapeHTML(x.image||skinImage(x.name))+'" alt="'+escapeHTML(x.name)+'" onerror="this.remove();this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+(x.icon||'🔫')+'</span>'}
 function render(){
- saveGame();if($('balance')) $('balance').textContent=money(balance);
- if($('home-inventory-count')) $('home-inventory-count').textContent=inventory.length;
- if($('recent-drop')) $('recent-drop').textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет предметов';
- if($('inventory')) $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="case"><div class="art">'+itemVisual(x)+'</div><h3>'+escapeHTML(x.name)+'</h3><b class="price">'+money(x.price)+'</b><button data-sell="'+i+'">Продать</button></article>').join(''):'<p class="muted">Инвентарь пока пуст.</p>';
+ saveGame();$('balance').textContent=money(balance);
+ $('home-inventory-count').textContent=inventory.length;
+ $('recent-drop').textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет предметов';
+ $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="case"><div class="art">'+itemVisual(x)+'</div><h3>'+escapeHTML(x.name)+'</h3><b class="price">'+money(x.price)+'</b><button data-sell="'+i+'">Продать</button></article>').join(''):'<p class="muted">Инвентарь пока пуст.</p>';
  document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
 }
 $('home-inventory').onclick=()=>document.getElementById('inventory').scrollIntoView({behavior:'smooth',block:'start'});
-if($('topup')) $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
+$('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 render();
 
 const CASES_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
@@ -45,25 +45,61 @@ function showOpening(crate){
  const modal=document.createElement('div');modal.className='modal';modal.id='case-opening-modal';
  modal.innerHTML='<div class="dialog"><button class="close" id="opening-close" aria-label="Закрыть">×</button><div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>'+escapeHTML(crate.name)+'</h2><p>Удачи! Посмотрим, что внутри.</p></div><div class="opening-stage"><div class="cs2-reel"><div class="cs2-reel-track" id="reel-track"></div></div><div class="opening-pointer"></div><div class="case-burst" id="case-burst"><i class="burst-ring"></i><div class="burst-box">📦</div><span>ОТКРЫВАЕМ КЕЙС</span></div></div><div class="opening-status" id="opening-status"><i class="opening-pulse"></i>ПОДГОТОВКА</div><div id="opening-result" class="hidden"><h3 class="opening-drop-name" id="opening-drop-name"></h3><b class="opening-drop-price" id="opening-drop-price"></b><button class="opening-claim" id="opening-claim">Забрать в инвентарь</button></div><div class="opening-footnote">Демо-режим · стоимость открытия '+money(CASE_PRICE)+'</div></div>';
  document.body.appendChild(modal);
- const close=()=>modal.remove();$('opening-close').onclick=close;
+ let closed=false,animation=null;
+ const close=()=>{closed=true;if(animation)animation.cancel();modal.remove()};
+ $('opening-close').onclick=close;
  modal.addEventListener('click',e=>{if(e.target===modal)close()});
  const winner=chooseDrop(crate);if(!winner){$('opening-status').textContent='В этом кейсе пока нет списка предметов.';return}
- const drops=getCaseDrops(crate);const track=$('reel-track'),winnerIndex=52;
- const reel=Array.from({length:60},(_,i)=>i===winnerIndex?winner:drops[Math.floor(Math.random()*drops.length)]);
+ const drops=getCaseDrops(crate),track=$('reel-track'),winnerIndex=52;
+ const reel=Array.from({length:70},(_,i)=>i===winnerIndex?winner:drops[Math.floor(Math.random()*drops.length)]);
  track.innerHTML=reel.map(dropCard).join('');
  const status=$('opening-status'),burst=$('case-burst'),result=$('opening-result');
+ function revealWinner(){
+  if(closed||!modal.isConnected)return;
+  status.textContent='ВЫПАЛ ПРЕДМЕТ!';
+  $('opening-drop-name').textContent=winner.name;
+  $('opening-drop-price').textContent='≈ '+money(winner.price);
+  result.classList.remove('hidden');
+  const stage=modal.querySelector('.opening-stage');
+  stage.insertAdjacentHTML('beforeend','<div class="opening-winner">'+(winner.image?'<img class="reveal-image" src="'+escapeHTML(winner.image)+'" alt="'+escapeHTML(winner.name)+'" onerror="this.style.display=\'none\'">':'<span class="burst-box">🔫</span>')+'</div>');
+  track.children[winnerIndex].classList.add('is-winning');
+  $('opening-claim').onclick=()=>{inventory.push({...winner,icon:'🔫'});render();close()};
+ }
  window.setTimeout(()=>{
-  burst.classList.add('burst-out');status.innerHTML='<i class="opening-pulse"></i>РУЛЕТКА КРУТИТСЯ…';
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-   const cardWidth=150,cardCenter=winnerIndex*cardWidth+71,offset=Math.max(0,modal.querySelector('.opening-stage').clientWidth/2-cardCenter);
-   track.style.transition='transform 6.2s cubic-bezier(.08,.72,.08,1)';track.style.transform='translate3d('+offset+'px,0,0)';
-  }));
-  window.setTimeout(()=>{
-   status.textContent='ВЫПАЛ ПРЕДМЕТ!';$('opening-drop-name').textContent=winner.name;$('opening-drop-price').textContent='≈ '+money(winner.price);
-   result.classList.remove('hidden');const stage=modal.querySelector('.opening-stage');
-   stage.insertAdjacentHTML('beforeend','<div class="opening-winner">'+(winner.image?'<img class="reveal-image" src="'+escapeHTML(winner.image)+'" alt="'+escapeHTML(winner.name)+'" onerror="this.style.display=\'none\'">':'<span class="burst-box">🔫</span>')+'</div>');
-   $('opening-claim').onclick=()=>{inventory.push({...winner,icon:'🔫'});render();close()};
-  },6400);
+  if(closed||!modal.isConnected)return;
+  burst.classList.add('burst-out');
+  status.innerHTML='<i class="opening-pulse"></i>РУЛЕТКА КРУТИТСЯ…';
+  requestAnimationFrame(()=>{
+   requestAnimationFrame(()=>{
+    if(closed||!modal.isConnected)return;
+    const stage=modal.querySelector('.opening-stage');
+    const winningCard=track.children[winnerIndex];
+    // Reset to the true starting point, then animate the actual reel element.
+    track.style.transform='translate3d(0px,0,0)';
+    const stageRect=stage.getBoundingClientRect();
+    const cardRect=winningCard.getBoundingClientRect();
+    const distance=(stageRect.left+stageRect.width/2)-(cardRect.left+cardRect.width/2);
+    const endTransform='translate3d('+distance+'px,0,0)';
+    if(typeof track.animate==='function'){
+     animation=track.animate(
+      [{transform:'translate3d(0px,0,0)'},{transform:endTransform}],
+      {duration:6500,easing:'cubic-bezier(.08,.72,.08,1)',fill:'forwards'}
+     );
+     animation.onfinish=()=>{
+      if(closed)return;
+      track.style.transform=endTransform;
+      animation.cancel();
+      revealWinner();
+     };
+    }else{
+     track.style.transition='none';
+     void track.offsetWidth;
+     track.style.transition='transform 6.5s cubic-bezier(.08,.72,.08,1)';
+     track.style.transform=endTransform;
+     window.setTimeout(()=>{track.style.transition='none';revealWinner()},6700);
+    }
+   });
+  });
  },800);
 }
 async function renderCaseCatalog(){
