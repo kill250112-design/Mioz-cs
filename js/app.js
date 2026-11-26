@@ -86,13 +86,19 @@ function openCase(id){
  const items=Array.from({length:total},(_,i)=>i===targetIndex?pending:chooseDrop(c));
  $('result').innerHTML='<div class="opening-track">'+items.map(x=>'<span class="roulette-item"><img src="'+(x[4]||skinImage(x[0]))+'" alt="'+x[0]+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><i style="display:none">'+x[1]+'</i></span>').join('')+'</div>';
  const track=$('result').querySelector('.opening-track');
- requestAnimationFrame(()=>requestAnimationFrame(()=>{
-  const card=track.querySelector('.roulette-item'),step=card.getBoundingClientRect().width;
-  const offset=$('result').clientWidth/2-(targetIndex*step+card.getBoundingClientRect().width/2);
+ const reel=$('result');
+ requestAnimationFrame(()=>{
+  const card=track.querySelector('.roulette-item');
+  const cardWidth=card.offsetWidth||120;
+  const offset=Math.round(reel.getBoundingClientRect().width/2-(targetIndex*cardWidth+cardWidth/2));
+  track.style.transition='none';
   track.style.transform='translate3d(0,0,0)';
-  track.style.transition='transform 5.8s cubic-bezier(.08,.72,.12,1)';
-  requestAnimationFrame(()=>{track.style.transform='translate3d('+offset+'px,0,0)'});
- }));
+  track.getBoundingClientRect();
+  requestAnimationFrame(()=>{
+   track.style.transition='transform 6.2s cubic-bezier(.08,.72,.12,1)';
+   track.style.transform='translate3d('+offset+'px,0,0)';
+  });
+ });
  setTimeout(()=>{
   rolling=false;
   $('result').innerHTML='<div class="opening-winner">'+itemVisual(pending,'reveal-image')+'</div>';
