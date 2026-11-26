@@ -3,16 +3,21 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090c14"><title>CS2</title>
-<link rel="stylesheet" href="./css/style.css?v=108"><script type="module" src="./js/app.js?v=108"></script>
+<link rel="stylesheet" href="./css/style.css?v=99"><script type="module" src="./js/app.js?v=99"></script>
 </head>
 <body>
-
+<header class="topbar"><b class="logo" id="logo-home">CS<span>2</span></b><div class="top-actions"><div class="balance-pill"><span>💰</span><strong id="balance">1 000 ₽</strong></div><button class="topup" id="topup">Пополнить</button></div></header>
 <main>
-<section class="case-catalog" id="case-catalog">
-<div class="cases-heading"><h2>КЕЙСЫ CS2</h2><span id="case-count">Загрузка кейсов…</span></div>
-<div class="case-catalog-grid" id="case-catalog-grid"><div class="case-catalog-loading">Загружаем каталог CS2…</div></div>
+<section id="home-dashboard" class="home-dashboard">
+<div class="info-strip"><article class="info-card top-drop"><small>CS2</small><strong>Добро пожаловать</strong><span>Игровой профиль</span></article><article class="info-card recent-drop"><small>ПОСЛЕДНИЙ ПРЕДМЕТ</small><strong id="recent-drop">Пока нет предметов</strong><span>✦ Твоя коллекция</span></article></div>
+<button class="inventory-feature" id="home-inventory"><span class="feature-icon">🎒</span><span class="feature-copy"><strong>ИНВЕНТАРЬ</strong><small>Предметов: <b id="home-inventory-count">0</b></small></span></button>
 </section>
+<section class="case-catalog" id="case-catalog">
+  <div class="cases-heading"><h2>КЕЙСЫ CS2</h2><span id="case-count">Загрузка кейсов…</span></div>
+  <div class="case-catalog-grid" id="case-catalog-grid"><div class="case-catalog-loading">Загружаем каталог CS2…</div></div>
+</section>
+<section id="inventory" class="grid"></section>
 </main>
-
-
+<nav class="bottom-nav" aria-label="Навигация"><button data-tab="inventory" class="active"><span>🎒</span>Инвентарь</button></nav>
+<footer>Демо-игра CS2. Виртуальный баланс и предметы сохраняются на этом устройстве.</footer>
 </body></html>
