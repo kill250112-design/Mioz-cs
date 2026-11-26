@@ -181,3 +181,15 @@ button:focus-visible{
 .cs2-reel-track{position:relative;flex-shrink:0;transform:translate3d(0,0,0);will-change:transform}
 .opening-pointer{z-index:8;pointer-events:none}
 .cs2-reel-item.is-winning{position:relative;z-index:3;border-color:#ffe08a;box-shadow:0 0 0 2px #ffe08a66,0 0 30px #f3c75caa;filter:brightness(1.2)}
+
+
+/* Отдельные страницы и навигация сверху */
+body{padding-bottom:28px}
+.page-nav{position:sticky;top:0;z-index:12;display:flex;gap:8px;padding:9px 0 13px;margin:0 0 8px;background:linear-gradient(180deg,#090c14 75%,#090c1400)}
+.page-nav button{flex:1;min-height:43px;padding:10px 8px;border:1px solid #34445f;border-radius:12px;background:#141e30;color:#aebbd1;font-size:12px;font-weight:850}
+.page-nav button.active{color:#211708;border-color:#ffe5a0;background:linear-gradient(135deg,#ffe39a,#f3bd4f 55%,#bd7b20);box-shadow:0 6px 18px #d99a3030}
+.page-view{display:none;animation:pageEnter .22s ease both}
+.page-view.active{display:block}
+.page-heading{margin:20px 2px 16px;font-size:21px;letter-spacing:1px}
+@keyframes pageEnter{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:520px){body{padding-bottom:20px}.page-nav{gap:6px}.page-nav button{min-height:42px;font-size:11px}}
