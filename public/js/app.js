@@ -8,12 +8,17 @@ function skinImage(name){return 'https://raw.githubusercontent.com/renzynx/cs2-a
 function itemVisual(x){return '<img class="skin-image" src="'+escapeHTML(x.image||skinImage(x.name))+'" alt="'+escapeHTML(x.name)+'" onerror="this.remove();this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+(x.icon||'🔫')+'</span>'}
 function render(){
  saveGame();$('balance').textContent=money(balance);
- $('home-inventory-count').textContent=inventory.length;
- $('recent-drop').textContent=inventory.length?inventory[inventory.length-1].name:'Пока нет предметов';
- $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="case"><div class="art">'+itemVisual(x)+'</div><h3>'+escapeHTML(x.name)+'</h3><b class="price">'+money(x.price)+'</b><button data-sell="'+i+'">Продать</button></article>').join(''):'<p class="muted">Инвентарь пока пуст.</p>';
- document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(+b.dataset.sell,1)[0].price;render()});
+ const total=inventory.reduce((sum,x)=>sum+x.price,0);
+ $('inventory-count').textContent=inventory.length;
+ $('nav-inventory-count').textContent=inventory.length;
+ $('inventory-total').textContent=money(total);
+ $('inventory-sell-total').textContent=money(total);
+ $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="inventory-item"><div class="inventory-item-art">'+itemVisual(x)+'</div><div class="inventory-item-info"><span class="inventory-item-rarity">'+escapeHTML(x.rarity||'CS2 SKIN')+'</span><h3>'+escapeHTML(x.name)+'</h3><b>'+money(x.price)+'</b></div><button class="inventory-sell" data-sell="'+i+'">Продать</button></article>').reverse().join(''):'<div class="inventory-empty"><div>🎒</div><h3>Пока здесь пусто</h3><p>Открывай кейсы, чтобы получать скины. Все выигранные предметы появятся здесь.</p><button id="empty-go-cases">Перейти к кейсам</button></div>';
+ document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(inventory.length-1-Number(b.dataset.sell),1)[0].price;render()});
+ const emptyButton=$('empty-go-cases');if(emptyButton)emptyButton.onclick=()=>switchTab('cases');
 }
-$('home-inventory').onclick=()=>document.getElementById('inventory').scrollIntoView({behavior:'smooth',block:'start'});
+function switchTab(tab){const cases=tab==='cases';$('case-catalog').classList.toggle('hidden',!cases);$('inventory-page').classList.toggle('hidden',cases);document.querySelectorAll('.bottom-nav [data-tab]').forEach(button=>button.classList.toggle('active',button.dataset.tab===tab));window.scrollTo({top:0,behavior:'smooth'});}
+document.querySelectorAll('.bottom-nav [data-tab]').forEach(button=>button.addEventListener('click',()=>switchTab(button.dataset.tab)));
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 render();
 
