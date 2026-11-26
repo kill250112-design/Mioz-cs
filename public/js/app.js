@@ -1,8 +1,8 @@
-let balance=1000,caseCatalog=[],inventory=[],inventoryDescending=true,currentPage='cases';
+let balance=1000,caseCatalog=[],inventory=[],inventoryDescending=true,currentPage='cases',bonus100kGranted=false;
 const CASE_PRICE=100;
-try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance)}if(saved&&Array.isArray(saved.inventory)){inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price))}}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance)}if(saved&&Array.isArray(saved.inventory)){inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price))}bonus100kGranted=!!(saved&&saved.bonus100kGranted);if(!bonus100kGranted){balance+=100000;bonus100kGranted=true}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
-function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
+function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory,bonus100kGranted}))}catch(e){}}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function skinImage(name){return 'https://raw.githubusercontent.com/renzynx/cs2-assets/main/static/panorama/images/econ/default_generated/'+name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_light_png.png'}
 function render(){
