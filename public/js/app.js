@@ -1,8 +1,8 @@
-let balance=1000,caseCatalog=[],inventory=[],inventoryDescending=true,currentPage='cases',bonus100kGranted=false;
+let balance=1000,caseCatalog=[],inventory=[],inventoryDescending=true,currentPage='cases';
 const CASE_PRICE=100;
-try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance)}if(saved&&Array.isArray(saved.inventory)){inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price))}bonus100kGranted=!!(saved&&saved.bonus100kGranted);if(!bonus100kGranted){balance+=100000;bonus100kGranted=true}}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance)}if(saved&&Array.isArray(saved.inventory)){inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price))}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
-function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory,bonus100kGranted}))}catch(e){}}
+function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function skinImage(name){return 'https://raw.githubusercontent.com/renzynx/cs2-assets/main/static/panorama/images/econ/default_generated/'+name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_light_png.png'}
 function render(){
@@ -47,7 +47,7 @@ $('topup').onclick=()=>alert('Это демо-версия: реальные п�
 render();
 
 const CASES_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
-const rarityWeights={'Mil-Spec Grade':79.92,'Restricted':15.98,'Classified':3.2,'Covert':0.64,'Extraordinary':0.26};
+const rarityWeights={'Consumer Grade':79.92,'Industrial Grade':15.98,'Mil-Spec Grade':3.2,'Restricted':0.64,'Classified':0.128,'Covert':0.0256,'Extraordinary':0.0064};
 const rarityPrices={'Consumer Grade':[8,22],'Industrial Grade':[20,55],'Mil-Spec Grade':[45,120],'Restricted':[100,260],'Classified':[220,650],'Covert':[600,1800],'Extraordinary':[2500,9000]};
 function normalizeDrop(item){
  const rarity=item.rarity||item.rarity_name||{},rarityName=typeof rarity==='string'?rarity:(rarity.name||rarity.localized_name||'Mil-Spec Grade');
@@ -56,7 +56,7 @@ function normalizeDrop(item){
 function getCaseDrops(crate){
  const normal=Array.isArray(crate.contains)?crate.contains:[];
  const rare=Array.isArray(crate.contains_rare)?crate.contains_rare:[];
- return [...normal.map(normalizeDrop),...rare.filter(x=>x&&x.name).map(x=>({...normalizeDrop(x),rarity:'Extraordinary'}))];
+ return [...normal,...rare].filter(x=>x&&x.name).map(normalizeDrop);
 }
 function chooseDrop(crate){
  const normal=(crate.contains||[]).filter(x=>x&&x.name).map(normalizeDrop);
@@ -133,20 +133,6 @@ function showOpening(crate){
   });
  },800);
 }
-
-function renderCaseDetails(index){
- const crate=caseCatalog[index];if(!crate)return;
- const grid=$('case-catalog-grid'),drops=getCaseDrops(crate);
- const groups={};
- drops.forEach(drop=>{const key=drop.rarity==='Extraordinary'?'Extraordinary':(drop.rarity in rarityWeights?drop.rarity:'Mil-Spec Grade');(groups[key]??=[]).push(drop)});
- const present=Object.keys(groups),total=present.reduce((sum,key)=>sum+rarityWeights[key],0)||1;
- const chanceFor=drop=>{const key=drop.rarity==='Extraordinary'?'Extraordinary':(drop.rarity in rarityWeights?drop.rarity:'Mil-Spec Grade');return (rarityWeights[key]/total/groups[key].length*100)};
- const itemRows=drops.map(drop=>'<div class="contents-row"><span>'+(drop.image?'<img class="skin-image" src="'+escapeHTML(drop.image)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'<span class="skin-image-fallback">🔫</span>')+'<span class="skin-name">'+escapeHTML(drop.name)+'</span></span><b>'+chanceFor(drop).toFixed(4).replace('.',',')+'%</b></div>').join('');
- grid.innerHTML='<article class="case-detail"><button type="button" class="detail-back" id="case-detail-back">← НАЗАД К КЕЙСАМ</button><div class="detail-art">'+(crate.image?'<img src="'+escapeHTML(crate.image)+'" alt="'+escapeHTML(crate.name)+'" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.style.display=\'none\'">':'📦')+'</div><h2>'+escapeHTML(crate.name)+'</h2><p class="muted">Внутри '+drops.length+' предметов. Ниже показаны шансы выпадения каждого предмета.</p><button type="button" class="case-open-button detail-open" id="detail-open-case">ОТКРЫТЬ КЕЙС · '+money(CASE_PRICE)+'</button><h3 class="odds-title">ВСЕ ПРЕДМЕТЫ И ШАНСЫ</h3><div class="contents-list">'+itemRows+'</div></article>';
- $('case-detail-back').onclick=()=>renderCaseCatalog();
- $('detail-open-case').onclick=()=>{if(balance<CASE_PRICE){alert('Недостаточно средств! Нужно '+money(CASE_PRICE)+'.');return}balance-=CASE_PRICE;render();showOpening(crate)};
-}
-
 async function renderCaseCatalog(){
  const grid=$('case-catalog-grid'),count=$('case-count');if(!grid||!count)return;
  try{
@@ -157,7 +143,7 @@ async function renderCaseCatalog(){
   if(!caseCatalog.length)throw new Error('Список кейсов пока недоступен');
   count.textContent=caseCatalog.length+' кейсов';
   grid.innerHTML=caseCatalog.map((item,index)=>'<article class="case-catalog-card"><div class="case-catalog-art"><img src="'+escapeHTML(item.image||'')+'" alt="'+escapeHTML(item.name)+'" loading="'+(index<6?'eager':'lazy')+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="case-image-fallback" aria-hidden="true">📦</span></div><div class="case-catalog-info"><h3>'+escapeHTML(item.name)+'</h3><span>'+(item.first_sale_date?new Date(item.first_sale_date+'T00:00:00').toLocaleDateString('ru-RU'):'CS2')+'</span></div><button class="case-open-button" data-open-case="'+index+'">ОТКРЫТЬ · '+money(CASE_PRICE)+'</button></article>').join('');
-  grid.querySelectorAll('[data-open-case]').forEach(button=>button.onclick=()=>renderCaseDetails(Number(button.dataset.openCase)));
+  grid.querySelectorAll('[data-open-case]').forEach(button=>button.onclick=()=>{if(balance<CASE_PRICE){alert('Недостаточно средств! Нужно '+money(CASE_PRICE)+'.');return}const crate=caseCatalog[Number(button.dataset.openCase)];balance-=CASE_PRICE;render();showOpening(crate)});
  }catch(error){
   count.textContent='Каталог недоступен';grid.innerHTML='<p class="case-catalog-loading">Не получилось загрузить кейсы. Проверь подключение к интернету и обнови страницу.</p>';console.error('CS2 case catalog:',error);
  }
