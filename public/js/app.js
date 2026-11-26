@@ -9,15 +9,6 @@ function render(){
  $('balance').textContent=money(balance);
 }
 render();
-  closeTopup();
-  const notice=document.createElement('div');
-  notice.className='balance-toast';
-  notice.textContent='+'+money(amount)+' начислено на баланс';
-  document.body.appendChild(notice);
-  window.setTimeout(()=>notice.remove(),2200);
- });
-};
-render();
 
 const CASES_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
 const rarityWeights={'Consumer Grade':79.92,'Industrial Grade':15.98,'Mil-Spec Grade':3.2,'Restricted':0.64,'Classified':0.128,'Covert':0.0256,'Extraordinary':0.0064};
