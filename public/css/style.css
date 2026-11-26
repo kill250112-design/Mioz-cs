@@ -426,3 +426,6 @@ body{max-width:900px;padding:18px 22px 105px;background:radial-gradient(ellipse 
 #modal #result .drop-reveal{width:100%!important;min-height:clamp(250px,58vw,390px)!important;padding:0!important}
 #modal #result .reveal-image{width:100%!important;max-width:900px!important;height:clamp(250px,58vw,390px)!important;object-fit:contain!important;object-position:center!important}
 #modal #dropName,#modal #dropPrice{max-width:96vw;text-align:center}
+
+/* Lower skin icons slightly while the roulette is spinning */
+#modal #result .roulette-item img{transform:translateY(12px)}
