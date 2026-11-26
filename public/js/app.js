@@ -49,21 +49,25 @@ function showOpening(crate){
  modal.addEventListener('click',e=>{if(e.target===modal)close()});
  const winner=chooseDrop(crate);if(!winner){$('opening-status').textContent='В этом кейсе пока нет списка предметов.';return}
  const drops=getCaseDrops(crate);const track=$('reel-track'),winnerIndex=52;
- const reel=Array.from({length:60},(_,i)=>i===winnerIndex?winner:drops[Math.floor(Math.random()*drops.length)]);
+ const reel=Array.from({length:70},(_,i)=>i===winnerIndex?winner:drops[Math.floor(Math.random()*drops.length)]);
  track.innerHTML=reel.map(dropCard).join('');
  const status=$('opening-status'),burst=$('case-burst'),result=$('opening-result');
  window.setTimeout(()=>{
   burst.classList.add('burst-out');status.innerHTML='<i class="opening-pulse"></i>РУЛЕТКА КРУТИТСЯ…';
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-   const cardWidth=150,cardCenter=winnerIndex*cardWidth+71,offset=Math.max(0,modal.querySelector('.opening-stage').clientWidth/2-cardCenter);
-   track.style.transition='transform 6.2s cubic-bezier(.08,.72,.08,1)';track.style.transform='translate3d('+offset+'px,0,0)';
+   const stage=modal.querySelector('.opening-stage');
+   const winningCard=track.children[winnerIndex];
+   const targetX=stage.clientWidth/2-(winningCard.offsetLeft+winningCard.offsetWidth/2);
+   track.style.transition='transform 5.5s cubic-bezier(.08,.72,.08,1)';
+   track.style.transform='translate3d('+targetX+'px,0,0)';
   }));
   window.setTimeout(()=>{
    status.textContent='ВЫПАЛ ПРЕДМЕТ!';$('opening-drop-name').textContent=winner.name;$('opening-drop-price').textContent='≈ '+money(winner.price);
    result.classList.remove('hidden');const stage=modal.querySelector('.opening-stage');
    stage.insertAdjacentHTML('beforeend','<div class="opening-winner">'+(winner.image?'<img class="reveal-image" src="'+escapeHTML(winner.image)+'" alt="'+escapeHTML(winner.name)+'" onerror="this.style.display=\'none\'">':'<span class="burst-box">🔫</span>')+'</div>');
    $('opening-claim').onclick=()=>{inventory.push({...winner,icon:'🔫'});render();close()};
-  },6400);
+    track.children[winnerIndex].classList.add('is-winning');
+  },5700);
  },800);
 }
 async function renderCaseCatalog(){
