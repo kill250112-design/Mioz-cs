@@ -182,39 +182,3 @@ button:focus-visible{
 .opening-pointer{z-index:8;pointer-events:none}
 .cs2-reel-item.is-winning{position:relative;z-index:3;border-color:#ffe08a;box-shadow:0 0 0 2px #ffe08a66,0 0 30px #f3c75caa;filter:brightness(1.2)}
 
-
-/* Separate inventory tab */
-.page-section.hidden{display:none!important}
-.inventory-page{margin:22px 0 30px}
-.inventory-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 2px 18px}
-.section-kicker{color:var(--gold);font-size:9px;font-weight:900;letter-spacing:2px}
-.inventory-heading h2{margin:5px 0;font-size:26px;letter-spacing:-.6px}
-.inventory-heading p{margin:0;color:var(--muted);font-size:12px}
-.inventory-count-badge{display:grid;gap:2px;min-width:76px;padding:11px;border:1px solid #69552f;border-radius:14px;background:linear-gradient(145deg,#242b3a,#171f2e);text-align:center}
-.inventory-count-badge b{color:var(--gold);font-size:21px}
-.inventory-count-badge span{color:#aab7ce;font-size:9px}
-.inventory-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
-.inventory-stats article{display:grid;gap:7px;padding:14px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#1b293e,#111a29)}
-.inventory-stats article span{color:var(--muted);font-size:10px}
-.inventory-stats article b{color:var(--gold);font-size:18px}
-.inventory-toolbar{display:flex;justify-content:space-between;align-items:center;margin:0 2px 12px}
-.inventory-toolbar strong{font-size:15px}
-.inventory-toolbar span{color:var(--muted);font-size:10px}
-.inventory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.inventory-item{display:flex;flex-direction:column;min-width:0;padding:10px;border:1px solid #34435d;border-radius:16px;background:linear-gradient(155deg,#1c2a40,#111a29);box-shadow:0 8px 20px #0003}
-.inventory-item-art{display:grid;place-items:center;height:118px;margin-bottom:9px;overflow:hidden;border-radius:12px;background:radial-gradient(circle at 50% 40%,#405472,#1b293d 72%)}
-.inventory-item-art .skin-image{width:100%;height:100%;padding:8px;object-fit:contain}
-.inventory-item-info{flex:1;min-width:0}
-.inventory-item-rarity{color:#c7a35e;font-size:8px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
-.inventory-item-info h3{min-height:34px;margin:5px 0;font-size:11px;line-height:1.35;overflow-wrap:anywhere}
-.inventory-item-info>b{display:block;margin:7px 0;color:var(--gold);font-size:14px}
-.inventory-sell{width:100%;min-height:39px;margin-top:7px;border:1px solid #ffe29a;border-radius:10px;background:linear-gradient(135deg,#ffe39a,#f3bd4f 58%,#bd7b20);color:#211708;font-size:11px;font-weight:950}
-.inventory-empty{grid-column:1/-1;display:grid;justify-items:center;padding:32px 22px;border:1px dashed #45536d;border-radius:18px;background:#131d2c;text-align:center}
-.inventory-empty>div{font-size:48px}
-.inventory-empty h3{margin:12px 0 5px;font-size:17px}
-.inventory-empty p{max-width:270px;margin:0;color:var(--muted);font-size:12px;line-height:1.5}
-.inventory-empty button{margin-top:17px;padding:11px 18px;border-radius:11px;background:linear-gradient(135deg,#ffe39a,#f3bd4f 58%,#bd7b20);color:#211708;font-size:11px;font-weight:950}
-.bottom-nav button{position:relative}
-.bottom-nav button i{position:absolute;top:2px;right:calc(50% - 27px);min-width:15px;padding:2px 4px;border-radius:8px;background:#f3c45b;color:#211708;font-size:8px;font-style:normal;font-weight:950}
-@media(min-width:650px){.inventory-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:520px){.inventory-heading h2{font-size:23px}.inventory-item-art{height:105px}.inventory-stats article{padding:11px}.inventory-stats article b{font-size:16px}}
