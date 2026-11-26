@@ -1,5 +1,5 @@
 let cases=[];
-const CASE_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
+const CASE_API='https://bymykel.github.io/CSGO-API/api/en/crates.json';
 const CASE_PRICES_USD={
 'Fever Case':0.35,'Gallery Case':0.40,'Kilowatt Case':0.05,'Revolution Case':0.08,'Recoil Case':0.12,'Dreams & Nightmares Case':0.51,'Snakebite Case':0.19,'Fracture Case':0.20,'Clutch Case':0.26,'Prisma 2 Case':0.60,'Prisma Case':0.55,'Danger Zone Case':0.62,'Horizon Case':0.89,'Spectrum 2 Case':2,'Spectrum Case':2.40,'Gamma 2 Case':1.99,'Gamma Case':2,'Chroma 3 Case':2.19,'Chroma 2 Case':2.55,'Chroma Case':3.34,'Glove Case':6.03,'Operation Hydra Case':19,'Operation Broken Fang Case':3.94,'Operation Riptide Case':4.49,'Operation Wildfire Case':1.88,'Operation Breakout Weapon Case':5.39,'Operation Phoenix Weapon Case':2.49,'Operation Vanguard Weapon Case':3.26,'Operation Bravo Case':46.46,'CS:GO Weapon Case':80.99,'CS:GO Weapon Case 2':14.77,'CS:GO Weapon Case 3':9.84,'eSports 2013 Case':35.54,'eSports 2013 Winter Case':8.67,'eSports 2014 Summer Case':8.50,'Winter Offensive Weapon Case':8.20,'Huntsman Weapon Case':6.31,'Falchion Case':1,'Shadow Case':1.02,'Revolver Case':1.80,'Shattered Web Case':2.90,'CS20 Case':0.49
 };
@@ -18,7 +18,7 @@ async function loadCases(){
   const data=await response.json();
   const wantedCases=['Dreams & Nightmares Case','Revolution Case','Kilowatt Case','Gallery Case','Fever Case'];
   cases=data.filter(c=>c.type==='Case'&&wantedCases.includes(c.name)&&Array.isArray(c.contains)&&c.contains.length).map((c,i)=>{
-   const regular=c.contains.map(x=>[x.name,'',itemMarketPrice(x.name,x.rarity?.name),rarityWeight(x.rarity?.name),x.image,x.rarity?.color]);
+   const regular=c.contains.map(x=>[x.name,'',itemMarketPrice(x.name,x.rarity?.name),rarityWeight(x.rarity?.name),(x.image||'' ).replace('raw.githubusercontent.com/ByMykel/counter-strike-image-tracker/main/','raw.githubusercontent.com/renzynx/cs2-assets/main/'),x.rarity?.color]);
    const rare=(c.contains_rare||[]).map(x=>[x.name,'',itemMarketPrice(x.name,'Special'),0.26,x.image,'#e4ae39']);
    const drops=[...regular,...rare];
    // Шансы рассчитываются по цене: чем дороже предмет, тем ниже его вероятность.
@@ -35,7 +35,7 @@ async function loadCases(){
    // В списке кейса дорогие скины сверху, дешёвые снизу.
    drops.sort((a,b)=>b[2]-a[2]);
    const usd=CASE_PRICES_USD[c.name];
-   return {id:'case-'+c.id,name:c.name,price:Math.round((usd||0.5)*USD_RUB),icon:'',image:c.image,drops};
+   return {id:'case-'+c.id,name:c.name,price:Math.round((usd||0.5)*USD_RUB),icon:'',image:(c.image||'').replace('raw.githubusercontent.com/ByMykel/counter-strike-image-tracker/main/','raw.githubusercontent.com/renzynx/cs2-assets/main/'),drops};
   });
   const order=['Dreams & Nightmares Case','Revolution Case','Kilowatt Case','Gallery Case','Fever Case'];
   cases.sort((a,b)=>order.indexOf(a.name)-order.indexOf(b.name));
@@ -48,8 +48,8 @@ try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(sav
 const $=id=>document.getElementById(id),money=n=>n.toLocaleString('ru-RU')+' ₽';
 function formatChance(value){return Math.round(value)+'%';}
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
-function skinImage(name){const wear=name.includes('Karambit')||name.includes('Bayonet')||name.includes('Butterfly Knife')?'Factory New':'Field-Tested';return 'https://cdn2.csgo.com/item/'+encodeURIComponent(name+' ('+wear+')')+'/512.png'}
-function itemVisual(d,cls='skin-image'){return '<img class="'+cls+'" src="'+(d[4]||skinImage(d[0]))+'" alt="'+d[0]+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+d[1]+'</span>'}
+function skinImage(name){const wear=name.includes('Karambit')||name.includes('Bayonet')||name.includes('Butterfly Knife')?'Factory New':'Field-Tested';return 'https://raw.githubusercontent.com/renzynx/cs2-assets/main/static/panorama/images/econ/default_generated/'+name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_light_png.png'}
+function itemVisual(d,cls='skin-image'){return '<img class="'+cls+'" src="'+(d[4]||skinImage(d[0]))+'" alt="'+d[0]+'" loading="eager" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+d[1]+'</span>'}
 function chooseDrop(c){let roll=Math.random()*100;for(const d of c.drops){roll-=d[3];if(roll<0)return d}return c.drops[c.drops.length-1]}
 function render(){
  saveGame();$('balance').textContent=money(balance);
