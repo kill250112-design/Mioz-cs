@@ -14,7 +14,7 @@ function render(){
  $('inventory-total').textContent=money(total);
  $('inventory-sell-total').textContent=money(total);
  $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="inventory-item"><div class="inventory-item-art">'+itemVisual(x)+'</div><div class="inventory-item-info"><span class="inventory-item-rarity">'+escapeHTML(x.rarity||'CS2 SKIN')+'</span><h3>'+escapeHTML(x.name)+'</h3><b>'+money(x.price)+'</b></div><button class="inventory-sell" data-sell="'+i+'">Продать</button></article>').reverse().join(''):'<div class="inventory-empty"><div>🎒</div><h3>Пока здесь пусто</h3><p>Открывай кейсы, чтобы получать скины. Все выигранные предметы появятся здесь.</p><button id="empty-go-cases">Перейти к кейсам</button></div>';
- document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(inventory.length-1-Number(b.dataset.sell),1)[0].price;render()});
+ document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(Number(b.dataset.sell),1)[0].price;render()});
  const emptyButton=$('empty-go-cases');if(emptyButton)emptyButton.onclick=()=>switchTab('cases');
 }
 function switchTab(tab){const cases=tab==='cases';$('case-catalog').classList.toggle('hidden',!cases);$('inventory-page').classList.toggle('hidden',cases);document.querySelectorAll('.bottom-nav [data-tab]').forEach(button=>button.classList.toggle('active',button.dataset.tab===tab));window.scrollTo({top:0,behavior:'smooth'});}
