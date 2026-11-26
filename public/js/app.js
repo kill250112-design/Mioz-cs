@@ -1,24 +1,14 @@
-let balance=1000,inventory=[],caseCatalog=[];
+let balance=1000,caseCatalog=[];
 const CASE_PRICE=100;
-try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)&&Array.isArray(saved.inventory)){balance=Math.max(0,saved.balance);inventory=saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)&&typeof x.icon==='string')}}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance)}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
-function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,inventory}))}catch(e){}}
+function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance}))}catch(e){}}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function skinImage(name){return 'https://raw.githubusercontent.com/renzynx/cs2-assets/main/static/panorama/images/econ/default_generated/'+name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_light_png.png'}
-function itemVisual(x){return '<img class="skin-image" src="'+escapeHTML(x.image||skinImage(x.name))+'" alt="'+escapeHTML(x.name)+'" onerror="this.remove();this.nextElementSibling.style.display=\'grid\'"><span class="skin-fallback" style="display:none">'+(x.icon||'🔫')+'</span>'}
 function render(){
- saveGame();$('balance').textContent=money(balance);
- const total=inventory.reduce((sum,x)=>sum+x.price,0);
- $('inventory-count').textContent=inventory.length;
- $('nav-inventory-count').textContent=inventory.length;
- $('inventory-total').textContent=money(total);
- $('inventory-sell-total').textContent=money(total);
- $('inventory').innerHTML=inventory.length?inventory.map((x,i)=>'<article class="inventory-item"><div class="inventory-item-art">'+itemVisual(x)+'</div><div class="inventory-item-info"><span class="inventory-item-rarity">'+escapeHTML(x.rarity||'CS2 SKIN')+'</span><h3>'+escapeHTML(x.name)+'</h3><b>'+money(x.price)+'</b></div><button class="inventory-sell" data-sell="'+i+'">Продать</button></article>').reverse().join(''):'<div class="inventory-empty"><div>🎒</div><h3>Пока здесь пусто</h3><p>Открывай кейсы, чтобы получать скины. Все выигранные предметы появятся здесь.</p><button id="empty-go-cases">Перейти к кейсам</button></div>';
- document.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{balance+=inventory.splice(Number(b.dataset.sell),1)[0].price;render()});
- const emptyButton=$('empty-go-cases');if(emptyButton)emptyButton.onclick=()=>switchTab('cases');
+ saveGame();
+ $('balance').textContent=money(balance);
 }
-function switchTab(tab){const cases=tab==='cases';$('case-catalog').classList.toggle('hidden',!cases);$('inventory-page').classList.toggle('hidden',cases);document.querySelectorAll('.bottom-nav [data-tab]').forEach(button=>button.classList.toggle('active',button.dataset.tab===tab));window.scrollTo({top:0,behavior:'smooth'});}
-document.querySelectorAll('.bottom-nav [data-tab]').forEach(button=>button.addEventListener('click',()=>switchTab(button.dataset.tab)));
 $('topup').onclick=()=>alert('Это демо-версия: реальные платежи пока не подключены.');
 render();
 
@@ -48,7 +38,7 @@ function chooseDrop(crate){
 function dropCard(drop){return '<div class="cs2-reel-item"><div class="cs2-reel-art">'+(drop.image?'<img class="cs2-reel-image" src="'+escapeHTML(drop.image)+'" alt="" onerror="this.style.display=\'none\'">':'<span class="skin-fallback">🔫</span>')+'</div><b>'+escapeHTML(drop.name)+'</b></div>'}
 function showOpening(crate){
  const modal=document.createElement('div');modal.className='modal';modal.id='case-opening-modal';
- modal.innerHTML='<div class="dialog"><button class="close" id="opening-close" aria-label="Закрыть">×</button><div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>'+escapeHTML(crate.name)+'</h2><p>Удачи! Посмотрим, что внутри.</p></div><div class="opening-stage"><div class="cs2-reel"><div class="cs2-reel-track" id="reel-track"></div></div><div class="opening-pointer"></div><div class="case-burst" id="case-burst"><i class="burst-ring"></i><div class="burst-box">📦</div><span>ОТКРЫВАЕМ КЕЙС</span></div></div><div class="opening-status" id="opening-status"><i class="opening-pulse"></i>ПОДГОТОВКА</div><div id="opening-result" class="hidden"><h3 class="opening-drop-name" id="opening-drop-name"></h3><b class="opening-drop-price" id="opening-drop-price"></b><button class="opening-claim" id="opening-claim">Забрать в инвентарь</button></div><div class="opening-footnote">Демо-режим · стоимость открытия '+money(CASE_PRICE)+'</div></div>';
+ modal.innerHTML='<div class="dialog"><button class="close" id="opening-close" aria-label="Закрыть">×</button><div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>'+escapeHTML(crate.name)+'</h2><p>Удачи! Посмотрим, что внутри.</p></div><div class="opening-stage"><div class="cs2-reel"><div class="cs2-reel-track" id="reel-track"></div></div><div class="opening-pointer"></div><div class="case-burst" id="case-burst"><i class="burst-ring"></i><div class="burst-box">📦</div><span>ОТКРЫВАЕМ КЕЙС</span></div></div><div class="opening-status" id="opening-status"><i class="opening-pulse"></i>ПОДГОТОВКА</div><div id="opening-result" class="hidden"><h3 class="opening-drop-name" id="opening-drop-name"></h3><b class="opening-drop-price" id="opening-drop-price"></b><button class="opening-claim" id="opening-claim">Завершить</button></div><div class="opening-footnote">Демо-режим · стоимость открытия '+money(CASE_PRICE)+'</div></div>';
  document.body.appendChild(modal);
  let closed=false,animation=null;
  const close=()=>{closed=true;if(animation)animation.cancel();modal.remove()};
@@ -68,7 +58,7 @@ function showOpening(crate){
   const stage=modal.querySelector('.opening-stage');
   stage.insertAdjacentHTML('beforeend','<div class="opening-winner">'+(winner.image?'<img class="reveal-image" src="'+escapeHTML(winner.image)+'" alt="'+escapeHTML(winner.name)+'" onerror="this.style.display=\'none\'">':'<span class="burst-box">🔫</span>')+'</div>');
   track.children[winnerIndex].classList.add('is-winning');
-  $('opening-claim').onclick=()=>{inventory.push({...winner,icon:'🔫'});render();close()};
+  $('opening-claim').onclick=close;
  }
  window.setTimeout(()=>{
   if(closed||!modal.isConnected)return;
