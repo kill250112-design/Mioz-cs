@@ -8,20 +8,42 @@ function render(){
  saveGame();
  $('balance').textContent=money(balance);
 }
-$('topup').onclick=()=>{
+let activeTopup=null;
+function closeTopup(){
+ if(!activeTopup)return;
+ const {popover,outsideHandler,escapeHandler}=activeTopup;
+ document.removeEventListener('pointerdown',outsideHandler,true);
+ document.removeEventListener('keydown',escapeHandler);
+ popover.remove();
+ activeTopup=null;
+}
+$('topup').onclick=event=>{
+ event.stopPropagation();
+ closeTopup();
  const amounts=[100,500,1000,5000,10000,100000];
- const modal=document.createElement('div');
- modal.className='modal topup-modal';
- modal.innerHTML='<div class="dialog topup-dialog"><button class="close" type="button" aria-label="Закрыть">×</button><div class="topup-heading"><span>CS2 · БАЛАНС</span><h2>Пополнение баланса</h2><p>Выбери сумму — она сразу начислится на твой баланс</p></div><div class="topup-amounts">'+amounts.map(amount=>'<button type="button" class="topup-amount" data-amount="'+amount+'"><span>＋</span>'+amount.toLocaleString('ru-RU')+' ₽</button>').join('')+'</div><p class="topup-demo-note">Демо-режим · реальные платежи не используются</p></div>';
- document.body.appendChild(modal);
- const close=()=>modal.remove();
- modal.querySelector('.close').onclick=close;
- modal.addEventListener('click',event=>{if(event.target===modal)close()});
- modal.querySelectorAll('[data-amount]').forEach(button=>button.onclick=()=>{
+ const popover=document.createElement('div');
+ popover.className='topup-popover';
+ popover.setAttribute('role','dialog');
+ popover.setAttribute('aria-label','Выбор суммы пополнения');
+ popover.innerHTML='<div class="topup-popover-title">Выбери сумму</div><div class="topup-popover-grid">'+amounts.map(amount=>'<button type="button" class="topup-popover-amount" data-amount="'+amount+'">'+amount.toLocaleString('ru-RU')+' ₽</button>').join('')+'</div><div class="topup-popover-note">Нажми на сумму — она сразу добавится</div>';
+ document.body.appendChild(popover);
+ const rect=$('topup').getBoundingClientRect();
+ const width=Math.min(280,window.innerWidth-24);
+ popover.style.width=width+'px';
+ popover.style.top=Math.min(rect.bottom+8,window.innerHeight-popover.offsetHeight-12)+'px';
+ popover.style.right=Math.max(12,window.innerWidth-rect.right)+'px';
+ const outsideHandler=pointerEvent=>{
+  if(!popover.contains(pointerEvent.target)&&!$('topup').contains(pointerEvent.target))closeTopup();
+ };
+ const escapeHandler=keyEvent=>{if(keyEvent.key==='Escape')closeTopup()};
+ activeTopup={popover,outsideHandler,escapeHandler};
+ document.addEventListener('pointerdown',outsideHandler,true);
+ document.addEventListener('keydown',escapeHandler);
+ popover.querySelectorAll('[data-amount]').forEach(button=>button.onclick=()=>{
   const amount=Number(button.dataset.amount);
   balance+=amount;
   render();
-  close();
+  closeTopup();
   const notice=document.createElement('div');
   notice.className='balance-toast';
   notice.textContent='+'+money(amount)+' начислено на баланс';
