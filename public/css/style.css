@@ -196,3 +196,6 @@ body{padding-bottom:28px}
 
 /* Actual case artwork during opening */
 .case-box-visual{width:min(180px,55%);height:125px;display:grid;place-items:center;animation:boxPulse 1s ease-in-out infinite alternate}.burst-case-image{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 9px 18px #0009) drop-shadow(0 0 14px #f3c75c66)}.burst-case-fallback{font-size:68px}
+
+/* Нижняя навигация: Главная, Кейсы, Инвентарь */
+@media(max-width:520px){body{padding-bottom:100px}.bottom-nav{display:flex}}
