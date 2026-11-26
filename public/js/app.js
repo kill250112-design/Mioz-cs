@@ -123,7 +123,7 @@ renderCaseCatalog();
 // Отдельные страницы разделов с адресами #home, #cases и #inventory.
 function navigatePage(page){
  const allowed=['home','cases','inventory'];if(!allowed.includes(page))page='home';
- document.querySelectorAll('[data-page-view]').forEach(el=>el.classList.toggle('active',el.id==='page-'+page));
+ document.querySelectorAll('.page-view').forEach(el=>el.classList.toggle('active',el.id==='page-'+page));
  document.querySelectorAll('[data-page]').forEach(el=>{const active=el.dataset.page===page;el.classList.toggle('active',active);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current')});
  if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
  window.scrollTo({top:0,behavior:'smooth'});
