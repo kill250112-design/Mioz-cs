@@ -16,9 +16,8 @@ async function loadCases(){
  try{
   const response=await fetch(CASE_API);if(!response.ok)throw new Error('API');
   const data=await response.json();
-  const wantedCases=['Dreams & Nightmares Case','Revolution Case','Kilowatt Case','Gallery Case','Fever Case'];
-  cases=data.filter(c=>c.type==='Case'&&wantedCases.includes(c.name)&&Array.isArray(c.contains)&&c.contains.length).map((c,i)=>{
-   const regular=c.contains.map(x=>[x.name,'',itemMarketPrice(x.name,x.rarity?.name),rarityWeight(x.rarity?.name),(x.image||'' ).replace('raw.githubusercontent.com/ByMykel/counter-strike-image-tracker/main/','raw.githubusercontent.com/renzynx/cs2-assets/main/'),x.rarity?.color]);
+  cases=data.filter(c=>c.type==='Case'&&Array.isArray(c.contains)&&c.contains.length).map((c,i)=>{
+   const regular=c.contains.map(x=>[x.name,'',itemMarketPrice(x.name,x.rarity?.name),rarityWeight(x.rarity?.name),(x.image||''),x.rarity?.color]);
    const rare=(c.contains_rare||[]).map(x=>[x.name,'',itemMarketPrice(x.name,'Special'),0.26,x.image,'#e4ae39']);
    const drops=[...regular,...rare];
    // Шансы рассчитываются по цене: чем дороже предмет, тем ниже его вероятность.
@@ -35,22 +34,15 @@ async function loadCases(){
    // В списке кейса дорогие скины сверху, дешёвые снизу.
    drops.sort((a,b)=>b[2]-a[2]);
    const usd=CASE_PRICES_USD[c.name];
-   return {id:'case-'+c.id,name:c.name,price:Math.round((usd||0.5)*USD_RUB),icon:'',image:(c.image||'').replace('raw.githubusercontent.com/ByMykel/counter-strike-image-tracker/main/','raw.githubusercontent.com/renzynx/cs2-assets/main/'),drops};
+   return {id:'case-'+c.id,name:c.name,price:100,icon:'',image:(c.image||''),drops};
   });
-  const order=['Dreams & Nightmares Case','Revolution Case','Kilowatt Case','Gallery Case','Fever Case'];
-  cases.sort((a,b)=>order.indexOf(a.name)-order.indexOf(b.name));
+  cases.sort((a,b)=>a.name.localeCompare(b.name));
   render();
  }catch(e){
   console.error('Не удалось загрузить каталог кейсов CS2',e);
-  const fallback=[
-   ['Dreams & Nightmares Case','🌙',41],
-   ['Revolution Case','🔥',7],
-   ['Kilowatt Case','⚡',4],
-   ['Gallery Case','🎨',32],
-   ['Fever Case','💗',28]
-  ];
-  cases=fallback.map(([name,icon,price],i)=>({
-   id:'fallback-case-'+i,name,icon,image:'',price,
+  const fallback=[['Dreams & Nightmares Case','🌙'],['Revolution Case','🔥'],['Kilowatt Case','⚡'],['Gallery Case','🎨'],['Fever Case','💗']];
+  cases=fallback.map(([name,icon],i)=>({
+   id:'fallback-case-'+i,name,icon,image:'',price:100,
    drops:[
     ['★ Нож / редкий предмет','🔪',12000,0.2,''],
     ['AWP | Элитное снаряжение','🎯',1800,4.8,''],
