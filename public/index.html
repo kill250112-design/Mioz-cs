@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090c14"><title>CS2</title>
-<link rel="stylesheet" href="./css/style.css?v=104"><script type="module" src="./js/app.js?v=105"></script>
+<link rel="stylesheet" href="./css/style.css?v=106"><script type="module" src="./js/app.js?v=106"></script>
 <script>window.showGamePage=function(page){if(['home','cases','inventory'].indexOf(page)<0)page='home';document.querySelectorAll('.page-view').forEach(function(s){s.classList.toggle('active',s.id==='page-'+page)});document.querySelectorAll('.bottom-nav [data-page]').forEach(function(b){var a=b.getAttribute('data-page')===page;b.classList.toggle('active',a);if(a)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});try{history.replaceState(null,'','#'+page)}catch(e){}window.scrollTo(0,0)};</script></head>
 <body>
 <header class="topbar"><b class="logo" id="logo-home">CS<span>2</span></b><div class="top-actions"><div class="balance-pill"><span>💰</span><strong id="balance">1 000 ₽</strong></div><button class="topup" id="topup">Пополнить</button></div></header>
@@ -12,18 +12,16 @@
 <section id="home-dashboard" class="home-dashboard">
 <div class="info-strip"><article class="info-card top-drop"><small>CS2</small><strong>Добро пожаловать</strong><span>Игровой профиль</span></article><article class="info-card recent-drop"><small>ПОСЛЕДНИЙ ПРЕДМЕТ</small><strong id="recent-drop">Пока нет предметов</strong><span>✦ Твоя коллекция</span></article></div>
 </section>
-</section>
-<section id="page-cases" class="page-view">
 <section class="case-catalog" id="case-catalog">
-  <div class="cases-heading"><h2>КЕЙСЫ CS2</h2><span id="case-count">Загрузка кейсов…</span></div>
-  <div class="case-catalog-grid" id="case-catalog-grid"><div class="case-catalog-loading">Загружаем каталог CS2…</div></div>
+<div class="cases-heading"><h2>КЕЙСЫ CS2</h2><span id="case-count">Загрузка кейсов…</span></div>
+<div class="case-catalog-grid" id="case-catalog-grid"><div class="case-catalog-loading">Загружаем каталог CS2…</div></div>
 </section>
-</section>
-<section id="page-inventory" class="page-view">
+<section id="inventory-section">
 <h2 class="page-heading">ИНВЕНТАРЬ</h2>
 <section id="inventory" class="grid"></section>
 </section>
+</section>
 </main>
 <footer>Демо-игра CS2. Виртуальный баланс и предметы сохраняются на этом устройстве.</footer>
-<nav class="bottom-nav" aria-label="Главное меню"><button type="button" data-page="home" class="active" onclick="window.showGamePage('home')"><span>⌂</span>Главная</button><button type="button" data-page="cases" onclick="window.showGamePage('cases')"><span>📦</span>Кейсы</button><button type="button" data-page="inventory" onclick="window.showGamePage('inventory')"><span>🎒</span>Инвентарь</button></nav>
+
 </body></html>
