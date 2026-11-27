@@ -133,6 +133,13 @@ async function renderCaseCatalog(){
 }
 renderCaseCatalog();
 
+// Switch between the standard CS2 catalogue and the future custom-case section.
+document.querySelectorAll('[data-case-category]').forEach(button=>button.addEventListener('click',()=>{
+ const category=button.dataset.caseCategory;
+ $('cs2-cases-section').classList.toggle('hidden',category!=='cs2');
+ $('custom-cases-section').classList.toggle('hidden',category!=='custom');
+ document.querySelectorAll('[data-case-category]').forEach(tab=>tab.classList.toggle('active',tab===button));
+}));
 
 // Virtual balance top-up (demo only; no real payments).
 const TOPUP_AMOUNTS=[100,500,1000,10000,100000];
