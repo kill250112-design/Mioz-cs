@@ -170,13 +170,19 @@ function getUpgradeStake(){
  const amount=Math.floor(Number($('upgrade-balance-amount')?.value));return Number.isFinite(amount)&&amount>0?{value:amount}:null;
 }
 function updateUpgradePreview(){
- const stake=getUpgradeStake(),value=stake?stake.value:0;
- $('upgrade-stake-preview').textContent=money(value);
- $('upgrade-win-preview').textContent=money(value*upgradeMultiplier);
- $('upgrade-chance-caption').textContent=upgradeChance+'%';
- $('upgrade-chance-fill').style.width=upgradeChance+'%';
- $('upgrade-start').disabled=upgradeBusy||!stake||(upgradeSource==='balance'&&value>balance);
- $('upgrade-start').textContent=upgradeBusy?'АПГРЕЙД…':'⚡ ЗАПУСТИТЬ АПГРЕЙД';
+ const stake=upgradeStake(),value=stake?stake.value:0;
+ const setText=(id,value)=>{const node=$(id);if(node)node.textContent=value};
+ const setHTML=(id,value)=>{const node=$(id);if(node)node.innerHTML=value};
+ setText('upgrade-balance-display',money(balance));
+ setText('upgrade-stake-name',stake?(stake.item?stake.item.name:'Баланс'):'Выбрать предмет или баланс');
+ setText('upgrade-stake-price',money(value));
+ setHTML('upgrade-stake-art',stake?.item?(stake.item.image?'<img src="'+escapeHTML(stake.item.image)+'" alt="">':'🔫'):'💰');
+ setText('upgrade-target-name',upgradeTarget?upgradeTarget.name:'Выберите цель');
+ setText('upgrade-target-price',upgradeTarget?money(upgradeTarget.price):'—');
+ setHTML('upgrade-target-art',upgradeTarget?(upgradeTarget.image?'<img src="'+escapeHTML(upgradeTarget.image)+'" alt="">':'🔫'):'⌁');
+ setHTML('upgrade-wheel-center',upgradeTarget?escapeHTML(upgradeTarget.name):'Выберите скин<br>для апгрейда');
+ const wheel=$('upgrade-wheel');if(wheel)wheel.style.setProperty('--chance',upgradeChance+'%');
+ const start=$('upgrade-start');if(start){start.disabled=upgradeBusy||!stake||!upgradeTarget||(upgradeSource==='balance'&&(value>balance||value<=0));start.textContent=upgradeBusy?'АПГРЕЙД…':(!upgradeTarget?'⌁ ВЫБЕРИТЕ ЦЕЛЬ':'⚡ ЗАПУСТИТЬ АПГРЕЙД')}
 }
 function setUpgradeSource(source){
  upgradeSource=source;
