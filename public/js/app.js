@@ -28,10 +28,12 @@ function showPage(page){
  const isInventory=page==='inventory';
  $('case-catalog').classList.toggle('hidden',isInventory);
  $('inventory-page').classList.toggle('hidden',!isInventory);
- document.querySelectorAll('.bottom-nav [data-page]').forEach(button=>button.classList.toggle('active',button.dataset.page===page));
+ $('nav-cases').classList.toggle('active',!isInventory);
+ $('nav-inventory').classList.toggle('active',isInventory);
  window.scrollTo({top:0,behavior:'smooth'});
 }
-document.querySelectorAll('.bottom-nav [data-page]').forEach(button=>button.addEventListener('click',()=>showPage(button.dataset.page)));
+$('nav-cases').addEventListener('click',()=>showPage('cases'));
+$('nav-inventory').addEventListener('click',()=>showPage('inventory'));
 
 const CASES_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
 const rarityWeights={'Consumer Grade':79.92,'Industrial Grade':15.98,'Mil-Spec Grade':3.2,'Restricted':0.64,'Classified':0.128,'Covert':0.0256,'Extraordinary':0.0064};
@@ -131,25 +133,6 @@ async function renderCaseCatalog(){
 }
 renderCaseCatalog();
 
-
-
-
-function renderInventory(){
- const grid=$('inventory-grid'),count=$('inventory-count');if(!grid||!count)return;
- count.textContent=inventory.length+' предметов';
- if(!inventory.length){grid.innerHTML='<p class="case-catalog-loading">Пока пусто. Открой кейс!</p>';return}
- grid.innerHTML=inventory.map((item,index)=>'<article class="inventory-card"><div class="inventory-art">'+(item.image?'<img src="'+escapeHTML(item.image)+'" alt="" onerror="this.style.display=\'none\'">':'🔫')+'</div><h3>'+escapeHTML(item.name)+'</h3><span class="inventory-price">≈ '+money(item.price||0)+'</span><button type="button" data-sell-item="'+index+'">ПРОДАТЬ</button></article>').join('');
- grid.querySelectorAll('[data-sell-item]').forEach(button=>button.onclick=()=>{const index=Number(button.dataset.sellItem),item=inventory[index];if(!item)return;balance+=Number(item.price)||0;inventory.splice(index,1);render()});
-}
-function showPage(page){
- const inventoryPage=page==='inventory';
- $('case-catalog').classList.toggle('hidden',inventoryPage);
- $('inventory-page').classList.toggle('hidden',!inventoryPage);
- $('nav-cases').classList.toggle('active',!inventoryPage);
- $('nav-inventory').classList.toggle('active',inventoryPage);
-}
-$('nav-cases').onclick=()=>showPage('cases');
-$('nav-inventory').onclick=()=>showPage('inventory');
 $('topup-open').onclick=()=>$('topup-modal').classList.remove('hidden');
 $('topup-close').onclick=()=>$('topup-modal').classList.add('hidden');
 $('topup-modal').addEventListener('click',e=>{if(e.target===$('topup-modal'))$('topup-modal').classList.add('hidden')});
