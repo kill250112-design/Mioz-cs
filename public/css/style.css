@@ -282,3 +282,5 @@ button:focus-visible{
 nav.bottom-nav{position:fixed!important;display:flex!important;left:50%!important;right:auto!important;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:min(600px,calc(100% - 24px))!important;z-index:999!important;visibility:visible!important;opacity:1!important}
 nav.bottom-nav [data-page="upgrade"]{display:flex!important;visibility:visible!important;opacity:1!important;flex:1 1 0!important}
 body{padding-bottom:90px}
+
+nav.bottom-nav [data-page="upgrade"]{display:flex!important;visibility:visible!important;opacity:1!important;flex:1 1 0!important;min-width:0!important;color:#ffe09a!important;font-weight:900!important}
