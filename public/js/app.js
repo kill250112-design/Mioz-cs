@@ -1,5 +1,4 @@
 let balance=1000,latestDrop='',inventory=[],caseCatalog=[],openedCases=0;
-let upgradeSource='balance',upgradeItemIndex=-1,upgradeChance=10,upgradeMultiplier=5,upgradeBusy=false;
 const CASE_PRICE=100;
 try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance);latestDrop=typeof saved.latestDrop==='string'?saved.latestDrop:'';inventory=Array.isArray(saved.inventory)?saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)) : [];openedCases=Number.isInteger(saved.openedCases)&&saved.openedCases>=0?saved.openedCases:0}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
@@ -13,7 +12,6 @@ function render(){
 }
 render();
 function renderInventory(){
- renderUpgradeItemPicker();
  const grid=$('inventory-grid'),count=$('inventory-count');
  if(!grid||!count)return;
  count.textContent=inventory.length+' предметов';
@@ -28,12 +26,10 @@ function renderInventory(){
  });
 }
 function showPage(page){
- const isInventory=page==='inventory',isUpgrade=page==='upgrade';
- $('home-dashboard').classList.toggle('hidden',isInventory||isUpgrade);
- $('case-catalog').classList.toggle('hidden',isInventory||isUpgrade);
+ const isInventory=page==='inventory';
+ $('home-dashboard').classList.toggle('hidden',isInventory);
+ $('case-catalog').classList.toggle('hidden',isInventory);
  $('inventory-page').classList.toggle('hidden',!isInventory);
- $('upgrade-page').classList.toggle('hidden',!isUpgrade);
- if(isUpgrade)updateUpgradePreview();
  document.querySelectorAll('.bottom-nav [data-page]').forEach(button=>button.classList.toggle('active',button.dataset.page===page));
  window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -156,146 +152,3 @@ function openTopup(){
  }));
 }
 $('topup-open')?.addEventListener('click',openTopup);
-
-
-function renderUpgradeItemPicker(){
- const picker=$('upgrade-item-picker');if(!picker)return;
- if(!inventory.length){picker.innerHTML='<div class="upgrade-no-items">Инвентарь пуст. Сначала открой кейс и забери предмет.</div>';upgradeItemIndex=-1;return;}
- if(upgradeItemIndex<0||!inventory[upgradeItemIndex])upgradeItemIndex=inventory.length-1;
- picker.innerHTML=inventory.map((item,index)=>'<button type="button" class="upgrade-item-option'+(index===upgradeItemIndex?' selected':'')+'" data-upgrade-item="'+index+'">'+(item.image?'<img src="'+escapeHTML(item.image)+'" alt="">':'<span>🔫</span>')+'<b>'+escapeHTML(item.name)+'</b><strong>'+money(item.price)+'</strong></button>').join('');
- picker.querySelectorAll('[data-upgrade-item]').forEach(button=>button.onclick=()=>{upgradeItemIndex=Number(button.dataset.upgradeItem);renderUpgradeItemPicker();updateUpgradePreview()});
-}
-function getUpgradeStake(){
- if(upgradeSource==='item'){const item=inventory[upgradeItemIndex];return item?{value:item.price,item,index:upgradeItemIndex}:null;}
- const amount=Math.floor(Number($('upgrade-balance-amount')?.value));return Number.isFinite(amount)&&amount>0?{value:amount}:null;
-}
-function updateUpgradePreview(){
- const stake=upgradeStake(),value=stake?stake.value:0;
- const setText=(id,value)=>{const node=$(id);if(node)node.textContent=value};
- const setHTML=(id,value)=>{const node=$(id);if(node)node.innerHTML=value};
- setText('upgrade-balance-display',money(balance));
- setText('upgrade-stake-name',stake?(stake.item?stake.item.name:'Баланс'):'Выбрать предмет или баланс');
- setText('upgrade-stake-price',money(value));
- setHTML('upgrade-stake-art',stake?.item?(stake.item.image?'<img src="'+escapeHTML(stake.item.image)+'" alt="">':'🔫'):'💰');
- setText('upgrade-target-name',upgradeTarget?upgradeTarget.name:'Выберите цель');
- setText('upgrade-target-price',upgradeTarget?money(upgradeTarget.price):'—');
- setHTML('upgrade-target-art',upgradeTarget?(upgradeTarget.image?'<img src="'+escapeHTML(upgradeTarget.image)+'" alt="">':'🔫'):'⌁');
- setHTML('upgrade-wheel-center',upgradeTarget?escapeHTML(upgradeTarget.name):'Выберите скин<br>для апгрейда');
- const wheel=$('upgrade-wheel');if(wheel)wheel.style.setProperty('--chance',upgradeChance+'%');
- const start=$('upgrade-start');if(start){start.disabled=upgradeBusy||!stake||!upgradeTarget||(upgradeSource==='balance'&&(value>balance||value<=0));start.textContent=upgradeBusy?'АПГРЕЙД…':(!upgradeTarget?'⌁ ВЫБЕРИТЕ ЦЕЛЬ':'⚡ ЗАПУСТИТЬ АПГРЕЙД')}
-}
-function setUpgradeSource(source){
- upgradeSource=source;
- document.querySelectorAll('[data-upgrade-source]').forEach(button=>button.classList.toggle('active',button.dataset.upgradeSource===source));
- $('upgrade-balance-source').classList.toggle('hidden',source!=='balance');
- $('upgrade-item-source').classList.toggle('hidden',source!=='item');
- updateUpgradePreview();
-}
-document.querySelectorAll('[data-upgrade-source]').forEach(button=>button.addEventListener('click',()=>setUpgradeSource(button.dataset.upgradeSource)));
-document.querySelectorAll('[data-upgrade-chance]').forEach(button=>button.addEventListener('click',()=>{
- upgradeChance=Number(button.dataset.upgradeChance);
- document.querySelectorAll('[data-upgrade-chance]').forEach(x=>x.classList.toggle('active',x===button));updateUpgradePreview();
-}));
-document.querySelectorAll('[data-upgrade-multiplier]').forEach(button=>button.addEventListener('click',()=>{
- upgradeMultiplier=Number(button.dataset.upgradeMultiplier);
- document.querySelectorAll('[data-upgrade-multiplier]').forEach(x=>x.classList.toggle('active',x===button));updateUpgradePreview();
-}));
-$('upgrade-balance-amount')?.addEventListener('input',updateUpgradePreview);
-document.querySelectorAll('[data-quick-amount]').forEach(button=>button.addEventListener('click',()=>{
- $('upgrade-balance-amount').value=button.dataset.quickAmount==='all'?Math.floor(balance):Number(button.dataset.quickAmount);updateUpgradePreview();
-}));
-$('upgrade-start')?.addEventListener('click',()=>{
- if(upgradeBusy)return;
- const stake=getUpgradeStake();if(!stake)return;
- if(upgradeSource==='balance'&&stake.value>balance){alert('На балансе недостаточно средств.');return;}
- upgradeBusy=true;updateUpgradePreview();
- if(upgradeSource==='balance')balance-=stake.value;else inventory.splice(stake.index,1);
- render();
- const modal=document.createElement('div');modal.className='modal upgrade-result-modal';
- modal.innerHTML='<section class="upgrade-result"><span class="upgrade-result-kicker">CS2 UPGRADE</span><div class="upgrade-result-orb">⚡</div><h2>ПРОВЕРКА ШАНСА</h2><div class="upgrade-result-percent">'+upgradeChance+'%</div><p>Цель: '+money(stake.value*upgradeMultiplier)+'</p><div class="upgrade-result-status">АПГРЕЙД ЗАПУЩЕН…</div></section>';
- document.body.appendChild(modal);
- const status=modal.querySelector('.upgrade-result-status'),won=Math.random()*100<upgradeChance;
- window.setTimeout(()=>{
-  if(won){const reward=Math.round(stake.value*upgradeMultiplier);balance+=reward;status.textContent='УСПЕХ! +'+money(reward);status.classList.add('success');}
-  else{status.textContent='НЕУДАЧА · СТАВКА ПОТЕРЯНА';status.classList.add('failure');}
-  render();
-  const close=document.createElement('button');close.className='upgrade-result-close';close.textContent='ПОНЯТНО';close.onclick=()=>{modal.remove();upgradeBusy=false;renderUpgradeItemPicker();updateUpgradePreview()};modal.querySelector('.upgrade-result').appendChild(close);
- },1500);
-});
-
-
-/* Screenshot-inspired target-based upgrader */
-let upgradeTarget=null,upgradePickerMode='stake';
-function renderUpgradeItemPicker(){
- const picker=$('upgrade-item-picker');if(!picker)return;
- if(!inventory.length){picker.innerHTML='<div class="upgrade-no-items">Инвентарь пуст — открой кейс и забери скин.</div>';upgradeItemIndex=-1;return;}
- if(upgradeItemIndex<0||!inventory[upgradeItemIndex])upgradeItemIndex=inventory.length-1;
- picker.innerHTML=inventory.map((item,index)=>'<button type="button" class="upgrade-item-option'+(index===upgradeItemIndex?' selected':'')+'" data-upgrade-item="'+index+'">'+(item.image?'<img src="'+escapeHTML(item.image)+'" alt="">':'<span>🔫</span>')+'<b>'+escapeHTML(item.name)+'</b><strong>'+money(item.price)+'</strong></button>').join('');
- picker.querySelectorAll('[data-upgrade-item]').forEach(button=>button.onclick=()=>{upgradeItemIndex=Number(button.dataset.upgradeItem);renderUpgradeItemPicker();updateUpgradePreview()});
-}
-function upgradeStake(){
- if(upgradeSource==='item'){const item=inventory[upgradeItemIndex];return item?{value:item.price,item,index:upgradeItemIndex}:null;}
- const value=Math.floor(Number($('upgrade-balance-amount')?.value));return Number.isFinite(value)&&value>0?{value}:null;
-}
-function upgradeTargetPool(){
- const all=[];caseCatalog.forEach(crate=>getCaseDrops(crate).forEach(item=>{
-  const range=rarityPrices[item.rarity]||[45,120],price=Math.round((range[0]+range[1])/2);
-  if(!all.some(x=>x.name===item.name))all.push({...item,price});
- }));
- return all;
-}
-function openUpgradePicker(mode){
- upgradePickerMode=mode;
- const picker=mode==='target'?$('upgrade-target-picker'):$('upgrade-item-picker');
- if(mode==='target'){
-  const stake=upgradeStake(),wanted=stake?stake.value*upgradeMultiplier:0,pool=upgradeTargetPool().sort((a,b)=>Math.abs(a.price-wanted)-Math.abs(b.price-wanted)).slice(0,40);
-  picker.classList.remove('hidden');
-  picker.innerHTML=pool.length?pool.map((item,index)=>'<button type="button" class="upgrade-item-option" data-target-index="'+index+'">'+(item.image?'<img src="'+escapeHTML(item.image)+'" alt="">':'<span>🔫</span>')+'<b>'+escapeHTML(item.name)+'</b><strong>'+money(item.price)+'</strong></button>').join(''):'<div class="upgrade-no-items">Загружаем предметы кейсов…</div>';
-  picker.querySelectorAll('[data-target-index]').forEach(button=>button.onclick=()=>{upgradeTarget=pool[Number(button.dataset.targetIndex)];picker.classList.add('hidden');updateUpgradePreview()});
- }else{picker.classList.toggle('hidden');}
-}
-function updateUpgradePreview(){
- const stake=upgradeStake(),value=stake?stake.value:0;
- $('upgrade-balance-display').textContent=money(balance);
- $('upgrade-stake-name').textContent=stake?(stake.item?stake.item.name:'Баланс'): 'Выбрать предмет или баланс';
- $('upgrade-stake-price').textContent=money(value);
- $('upgrade-stake-art').innerHTML=stake?.item?(stake.item.image?'<img src="'+escapeHTML(stake.item.image)+'" alt="">':'🔫'):'💰';
- $('upgrade-target-name').textContent=upgradeTarget?upgradeTarget.name:'Выберите цель';
- $('upgrade-target-price').textContent=upgradeTarget?money(upgradeTarget.price):'—';
- $('upgrade-target-art').innerHTML=upgradeTarget?(upgradeTarget.image?'<img src="'+escapeHTML(upgradeTarget.image)+'" alt="">':'🔫'):'⌁';
- $('upgrade-wheel-center').innerHTML=upgradeTarget?escapeHTML(upgradeTarget.name):'Выберите скин<br>для апгрейда';
- $('upgrade-wheel').style.setProperty('--chance',upgradeChance+'%');
- $('upgrade-start').disabled=upgradeBusy||!stake||!upgradeTarget||(upgradeSource==='balance'&&(value>balance||value<=0));
- $('upgrade-start').textContent=upgradeBusy?'АПГРЕЙД…':(!upgradeTarget?'⌁ ВЫБЕРИТЕ ЦЕЛЬ':'⚡ ЗАПУСТИТЬ АПГРЕЙД');
-}
-document.querySelectorAll('[data-upgrade-source]').forEach(button=>button.addEventListener('click',()=>setUpgradeSource(button.dataset.upgradeSource)));
-document.querySelectorAll('[data-upgrade-chance]').forEach(button=>button.addEventListener('click',()=>{
- upgradeChance=Number(button.dataset.upgradeChance);document.querySelectorAll('[data-upgrade-chance]').forEach(x=>x.classList.toggle('active',x===button));updateUpgradePreview();
-}));
-document.querySelectorAll('[data-upgrade-multiplier]').forEach(button=>button.addEventListener('click',()=>{
- upgradeMultiplier=Number(button.dataset.upgradeMultiplier);document.querySelectorAll('[data-upgrade-multiplier]').forEach(x=>x.classList.toggle('active',x===button));upgradeTarget=null;updateUpgradePreview();
-}));
-$('upgrade-balance-amount')?.addEventListener('input',()=>{upgradeTarget=null;updateUpgradePreview()});
-$('upgrade-stake-card')?.addEventListener('click',()=>{if(upgradeSource==='item')openUpgradePicker('stake');else $('upgrade-balance-amount').focus()});
-$('upgrade-target-card')?.addEventListener('click',()=>openUpgradePicker('target'));
-const oldUpgradeButton=$('upgrade-start');if(oldUpgradeButton){const fresh=oldUpgradeButton.cloneNode(true);oldUpgradeButton.replaceWith(fresh);fresh.addEventListener('click',()=>{
- if(upgradeBusy)return;const stake=upgradeStake();if(!stake||!upgradeTarget)return;
- if(upgradeSource==='balance'&&stake.value>balance){alert('На балансе недостаточно средств.');return;}
- upgradeBusy=true;if(upgradeSource==='balance')balance-=stake.value;else inventory.splice(stake.index,1);render();updateUpgradePreview();
- const modal=document.createElement('div');modal.className='modal upgrade-result-modal';modal.innerHTML='<section class="upgrade-result"><span class="upgrade-result-kicker">CS2 UPGRADER</span><div class="upgrade-result-orb">⚡</div><h2>ПРОВЕРКА ШАНСА</h2><div class="upgrade-result-percent">'+upgradeChance+'%</div><p>'+escapeHTML(upgradeTarget.name)+'</p><div class="upgrade-result-status">АПГРЕЙД ЗАПУЩЕН…</div></section>';document.body.appendChild(modal);
- const target={...upgradeTarget},status=modal.querySelector('.upgrade-result-status'),won=Math.random()*100<upgradeChance;
- window.setTimeout(()=>{if(won){inventory.push(target);latestDrop=target.name;status.textContent='УСПЕХ! ПРЕДМЕТ ПОЛУЧЕН';status.classList.add('success')}else{status.textContent='НЕУДАЧА · СТАВКА ПОТЕРЯНА';status.classList.add('failure')}render();const close=document.createElement('button');close.className='upgrade-result-close';close.textContent='ПОНЯТНО';close.onclick=()=>{modal.remove();upgradeBusy=false;updateUpgradePreview()};modal.querySelector('.upgrade-result').appendChild(close)},1500);
-})}
-
-
-/* Safety net: always keep the Upgrader button in the bottom navigation */
-(function ensureUpgradeBottomTab(){
- const nav=document.querySelector('nav.bottom-nav');
- if(!nav)return;
- if(!nav.querySelector('[data-page="upgrade"]')){
-  const button=document.createElement('button');
-  button.type='button';button.dataset.page='upgrade';button.innerHTML='<span>⚡</span>Апгрейд';
-  nav.insertBefore(button,nav.querySelector('[data-page="inventory"]'));
-  button.addEventListener('click',()=>showPage('upgrade'));
- }
-})();
