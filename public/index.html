@@ -1,45 +1,25 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090c14">
-<title>CS2 Кейсы</title>
-<link rel="stylesheet" href="./css/style.css?v=127">
-<script type="module" src="./js/app.js?v=127"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090c14"><title>CS2</title>
+<link rel="stylesheet" href="./css/style.css?v=125"><script type="module" src="./js/app.js?v=125"></script>
 </head>
 <body>
-<header class="topbar">
-  <b class="logo" id="logo-home">CS<span>2</span></b>
-  <div class="top-actions">
-    <div class="balance-pill"><span>💰</span><strong id="balance">1 000 ₽</strong></div>
-    <button class="topup-button" id="topup-open" type="button">＋ Пополнить</button>
-  </div>
-</header>
+<header class="topbar"><b class="logo" id="logo-home">CS<span>2</span></b><div class="top-actions"><div class="balance-pill"><span>💰</span><strong id="balance">1 000 ₽</strong></div><button class="topup-button" id="topup-open" type="button">＋ Пополнить</button></div></header>
 <main>
-  <section class="case-catalog" id="case-catalog">
-    <div class="case-category-tabs" role="tablist" aria-label="Категории кейсов">
-      <button class="case-category-tab active" type="button" data-case-category="all">Все кейсы</button>
-      <button class="case-category-tab" type="button" data-case-category="custom">Кастомные</button>
-    </div>
-    <div id="all-cases-section">
-      <div class="cases-heading"><h2>ВСЕ КЕЙСЫ CS2</h2><span id="case-count">Загрузка кейсов…</span></div>
-      <div class="case-catalog-grid" id="case-catalog-grid"><div class="case-catalog-loading">Загружаем актуальный каталог CS2…</div></div>
-    </div>
-    <div id="custom-cases-section" class="custom-cases-section hidden">
-      <div class="custom-cases-empty"><span>✦</span><b>Кастомные кейсы</b><p>Здесь будут кейсы, которые ты выберешь. Пока список пуст — скажи, какой кейс сделать кастомным.</p></div>
-      <div class="case-catalog-grid" id="custom-case-grid"></div>
-    </div>
-  </section>
-  <section id="inventory-page" class="inventory-page hidden">
-    <div class="inventory-heading"><div><h2>МОЙ ИНВЕНТАРЬ</h2><p>Твои предметы</p></div><span id="inventory-count">0 предметов</span></div>
-    <div id="inventory-grid" class="inventory-grid"><div class="inventory-empty"><span>🎒</span><b>Инвентарь пока пуст</b></div></div>
-  </section>
+<section id="home-dashboard" class="home-dashboard">
+<div class="info-strip"><article class="info-card top-drop"><small>CS2</small><strong>Добро пожаловать</strong><span>Игровой профиль</span></article><article class="info-card recent-drop"><small>ПОСЛЕДНИЙ ДРОП</small><strong id="recent-drop">Пока не открывал кейсы</strong><span>✦ Удачи в открытии</span></article></div>
+
+</section>
+<section class="case-catalog" id="case-catalog">
+  <div class="cases-heading"><h2>КЕЙСЫ CS2</h2><span id="case-count">Загрузка кейсов…</span></div>
+  <div class="case-catalog-grid" id="case-catalog-grid"><div class="case-catalog-loading">Загружаем каталог CS2…</div></div>
+</section>
+<section id="inventory-page" class="inventory-page hidden"><div class="inventory-heading"><div><h2>МОЙ ИНВЕНТАРЬ</h2><p>Предметы, которые ты забрал из кейсов</p></div><span id="inventory-count">0 предметов</span></div><div id="inventory-grid" class="inventory-grid"></div></section>
+
 </main>
-<nav class="bottom-nav" aria-label="Навигация">
-  <button class="active" data-page="cases"><span>📦</span>Кейсы</button>
-  <button data-page="inventory"><span>🎒</span>Инвентарь</button>
-</nav>
+<nav class="bottom-nav" aria-label="Навигация"><button class="active" data-page="cases"><span>📦</span>Кейсы</button><button data-page="inventory"><span>🎒</span>Инвентарь</button></nav>
+
 <footer>Демо-игра CS2. Виртуальный баланс сохраняется на этом устройстве.</footer>
-</body>
-</html>
+</body></html>
