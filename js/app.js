@@ -66,8 +66,10 @@ function showOpening(crate){
  window.setTimeout(()=>{
   burst.classList.add('burst-out');status.innerHTML='<i class="opening-pulse"></i>РУЛЕТКА КРУТИТСЯ…';
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-   const cardWidth=150,cardCenter=winnerIndex*cardWidth+71,offset=modal.querySelector('.opening-stage').clientWidth/2-cardCenter;
+   const stage=modal.querySelector('.opening-stage'),winningCard=track.children[winnerIndex];
    track.style.transition='none';track.style.transform='translate3d(0,0,0)';track.getBoundingClientRect();
+   const stageRect=stage.getBoundingClientRect(),cardRect=winningCard.getBoundingClientRect();
+   const offset=stageRect.left+stageRect.width/2-(cardRect.left+cardRect.width/2);
    track.style.transition='transform 6.2s cubic-bezier(.08,.72,.08,1)';track.style.transform='translate3d('+offset+'px,0,0)';
   }));
   window.setTimeout(()=>{
