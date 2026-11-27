@@ -7,7 +7,6 @@ function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&'
 function render(){
  saveGame();
  $('balance').textContent=money(balance);
- $('recent-drop').textContent=latestDrop||'Пока не открывал кейсы';
  renderInventory();
 }
 render();
@@ -134,21 +133,3 @@ async function renderCaseCatalog(){
 renderCaseCatalog();
 
 
-// Virtual balance top-up (demo only; no real payments).
-const TOPUP_AMOUNTS=[100,500,1000,10000,100000];
-function openTopup(){
- if($('topup-modal'))return;
- const modal=document.createElement('div');modal.className='modal topup-modal';modal.id='topup-modal';
- modal.innerHTML='<section class="topup-dialog" role="dialog" aria-modal="true" aria-labelledby="topup-title"><button class="close topup-close" type="button" aria-label="Закрыть">×</button><span class="topup-kicker">CS2 WALLET</span><h2 id="topup-title">Пополнение баланса</h2><p>Выбери сумму виртуальных монет</p><div class="topup-options">'+TOPUP_AMOUNTS.map(amount=>'<button type="button" class="topup-option" data-topup="'+amount+'"><span>💰</span><b>+'+money(amount)+'</b></button>').join('')+'</div><small class="topup-note">Демо-пополнение — реальные деньги не списываются.</small></section>';
- document.body.appendChild(modal);
- const close=()=>modal.remove();
- modal.querySelector('.topup-close').addEventListener('click',close);
- modal.addEventListener('click',event=>{if(event.target===modal)close()});
- modal.querySelectorAll('[data-topup]').forEach(button=>button.addEventListener('click',()=>{
-  const amount=Number(button.dataset.topup);if(!TOPUP_AMOUNTS.includes(amount))return;
-  balance+=amount;render();close();
-  const toast=document.createElement('div');toast.className='topup-toast';toast.textContent='Баланс пополнен на '+money(amount);document.body.appendChild(toast);
-  window.setTimeout(()=>toast.remove(),2200);
- }));
-}
-$('topup-open')?.addEventListener('click',openTopup);
