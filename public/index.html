@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090c14"><title>CS2</title>
-<link rel="stylesheet" href="./css/style.css?v=127"><script type="module" src="./js/app.js?v=127"></script>
+<link rel="stylesheet" href="./css/style.css?v=125"><script type="module" src="./js/app.js?v=125"></script>
 </head>
 <body>
 <header class="topbar"><b class="logo" id="logo-home">CS<span>2</span></b><div class="top-actions"><div class="balance-pill"><span>💰</span><strong id="balance">1 000 ₽</strong></div><button class="topup-button" id="topup-open" type="button">＋ Пополнить</button></div></header>
@@ -17,10 +17,9 @@
   <div class="case-catalog-grid" id="case-catalog-grid"><div class="case-catalog-loading">Загружаем каталог CS2…</div></div>
 </section>
 <section id="inventory-page" class="inventory-page hidden"><div class="inventory-heading"><div><h2>МОЙ ИНВЕНТАРЬ</h2><p>Предметы, которые ты забрал из кейсов</p></div><span id="inventory-count">0 предметов</span></div><div id="inventory-grid" class="inventory-grid"></div></section>
-<section id="upgrade-page" class="upgrade-page hidden"><div class="upgrade-heading"><small>CS2 WORKSHOP</small><h2>АПГРЕЙДЕР</h2><p>Испытай удачу и попробуй улучшить предмет</p></div><div class="upgrade-wheel-wrap"><div class="upgrade-wheel" id="upgrade-wheel"><div class="upgrade-wheel-core"><b id="upgrade-chance-label">50%</b><span>ШАНС</span></div></div><i class="upgrade-pointer"></i></div><div class="upgrade-panel"><div class="upgrade-field"><label>ЧЕМ РИСКУЕМ</label><div class="upgrade-source"><button type="button" class="selected" data-upgrade-source="balance">💰 Баланс</button><button type="button" data-upgrade-source="item">🎒 Предмет</button></div><div id="upgrade-balance-stake"><input id="upgrade-stake" type="number" min="10" step="10" value="100" inputmode="numeric" aria-label="Сумма ставки"><span>₽</span></div><select id="upgrade-item-stake" class="hidden" aria-label="Предмет для ставки"></select></div><div class="upgrade-field"><label>МНОЖИТЕЛЬ</label><div class="upgrade-choices"><button type="button" data-upgrade-multiplier="2" class="selected">×2</button><button type="button" data-upgrade-multiplier="5">×5</button><button type="button" data-upgrade-multiplier="10">×10</button></div></div><div class="upgrade-field"><label>ШАНС УСПЕХА</label><div class="upgrade-choices"><button type="button" data-upgrade-chance="10">10%</button><button type="button" data-upgrade-chance="50" class="selected">50%</button><button type="button" data-upgrade-chance="75">75%</button></div></div><div class="upgrade-field"><label>ЖЕЛАЕМЫЙ ПРЕДМЕТ</label><select id="upgrade-target" aria-label="Желаемый предмет"><option value="">Сначала загрузи кейсы…</option></select><div class="upgrade-target-value" id="upgrade-target-value">Выбери предмет для апгрейда</div></div><button id="upgrade-start" class="upgrade-start" type="button">УЛУЧШИТЬ</button><p class="upgrade-hint" id="upgrade-hint">При успехе получишь выбранный предмет. При неудаче ставка сгорит.</p></div></section>
 
 </main>
-<nav class="bottom-nav" aria-label="Навигация"><button class="active" data-page="cases"><span>📦</span>Кейсы</button><button data-page="upgrade"><span>⚡</span>Апгрейдер</button><button data-page="inventory"><span>🎒</span>Инвентарь</button></nav>
+<nav class="bottom-nav" aria-label="Навигация"><button class="active" data-page="cases"><span>📦</span>Кейсы</button><button data-page="inventory"><span>🎒</span>Инвентарь</button></nav>
 
 <footer>Демо-игра CS2. Виртуальный баланс сохраняется на этом устройстве.</footer>
 </body></html>
