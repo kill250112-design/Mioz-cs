@@ -277,3 +277,8 @@ button:focus-visible{
 .upgrade-topline .upgrade-topline-title{padding:9px 14px;border:1px solid #c9a83c;border-radius:12px;color:#ffe45c;background:#453c17;font-size:13px;font-weight:950;letter-spacing:1px}
 .bottom-nav{position:fixed!important;left:50%!important;bottom:max(10px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;z-index:50!important}
 .upgrade-page{padding-bottom:100px!important}
+
+/* Force the upgrader tab to stay in the shared bottom navigation */
+nav.bottom-nav{position:fixed!important;display:flex!important;left:50%!important;right:auto!important;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:min(600px,calc(100% - 24px))!important;z-index:999!important;visibility:visible!important;opacity:1!important}
+nav.bottom-nav [data-page="upgrade"]{display:flex!important;visibility:visible!important;opacity:1!important;flex:1 1 0!important}
+body{padding-bottom:90px}
