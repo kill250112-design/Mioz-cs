@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090c14"><title>CS2</title>
-<link rel="stylesheet" href="./css/style.css?v=131"><script type="module" src="./js/app.js?v=131"></script>
+<link rel="stylesheet" href="./css/style.css?v=125"><script type="module" src="./js/app.js?v=125"></script>
 </head>
 <body>
 <header class="topbar"><b class="logo" id="logo-home">CS<span>2</span></b><div class="top-actions"><div class="balance-pill"><span>💰</span><strong id="balance">1 000 ₽</strong></div><button class="topup-button" id="topup-open" type="button">＋ Пополнить</button></div></header>
@@ -16,18 +16,10 @@
   <div class="cases-heading"><h2>КЕЙСЫ CS2</h2><span id="case-count">Загрузка кейсов…</span></div>
   <div class="case-catalog-grid" id="case-catalog-grid"><div class="case-catalog-loading">Загружаем каталог CS2…</div></div>
 </section>
-<section id="upgrade-page" class="upgrade-page hidden">
-<div class="upgrade-heading"><div><h2>UPGRADER</h2><p>Улучши свой предмет</p></div><div class="upgrade-balance">БАЛАНС: <b id="upgrade-balance-display">1 000 ₽</b></div></div>
-<div class="upgrade-topline"><span class="upgrade-topline-title">UPGRADER</span><span>КЕЙСЫ</span><span>⚙</span></div>
-<div class="upgrade-wheel-wrap"><div class="upgrade-wheel" id="upgrade-wheel"><span class="wheel-top">100%</span><span class="wheel-left">50%</span><span class="wheel-right">50%</span><span class="wheel-bottom">0%</span><div class="wheel-center"><b id="upgrade-wheel-center">Выберите скин<br>для апгрейда</b></div><i class="wheel-pointer"></i></div></div>
-<div class="upgrade-cards"><button type="button" class="upgrade-card" id="upgrade-stake-card"><b>ВАША<br>СТАВКА</b><div class="upgrade-card-art" id="upgrade-stake-art">💰</div><strong id="upgrade-stake-name">Выбрать предмет или баланс</strong><span id="upgrade-stake-price">100 ₽</span></button><span class="upgrade-mid-arrow">➜</span><button type="button" class="upgrade-card target-card" id="upgrade-target-card"><b>ЦЕЛЬ</b><div class="upgrade-card-art" id="upgrade-target-art">⌁</div><strong id="upgrade-target-name">Выберите цель</strong><span id="upgrade-target-price">—</span></button></div>
-<button type="button" id="upgrade-start" class="upgrade-start" disabled>⌁ ВЫБЕРИТЕ ЦЕЛЬ</button>
-<div class="upgrade-controls"><div class="upgrade-control-row"><button type="button" class="upgrade-choice" data-upgrade-multiplier="2">×2</button><button type="button" class="upgrade-choice active" data-upgrade-multiplier="5">×5</button><button type="button" class="upgrade-choice" data-upgrade-multiplier="10">×10</button><button type="button" class="upgrade-choice active" data-upgrade-chance="10">10%</button><button type="button" class="upgrade-choice" data-upgrade-chance="50">50%</button><button type="button" class="upgrade-choice" data-upgrade-chance="75">75%</button></div></div>
-<div class="upgrade-source-picker"><div class="upgrade-tabs"><button type="button" class="upgrade-source active" data-upgrade-source="balance">💰 Баланс</button><button type="button" class="upgrade-source" data-upgrade-source="item">🎒 Предмет</button></div><div id="upgrade-balance-source" class="upgrade-source-panel"><label for="upgrade-balance-amount">Сумма ставки</label><input id="upgrade-balance-amount" type="number" min="1" value="100"></div><div id="upgrade-item-source" class="upgrade-source-panel hidden"><div id="upgrade-item-picker" class="upgrade-item-picker"></div></div><div id="upgrade-target-picker" class="upgrade-item-picker hidden"></div></div>
-</section><section id="inventory-page" class="inventory-page hidden"><div class="inventory-heading"><div><h2>МОЙ ИНВЕНТАРЬ</h2><p>Предметы, которые ты забрал из кейсов</p></div><span id="inventory-count">0 предметов</span></div><div id="inventory-grid" class="inventory-grid"></div></section>
+<section id="inventory-page" class="inventory-page hidden"><div class="inventory-heading"><div><h2>МОЙ ИНВЕНТАРЬ</h2><p>Предметы, которые ты забрал из кейсов</p></div><span id="inventory-count">0 предметов</span></div><div id="inventory-grid" class="inventory-grid"></div></section>
 
 </main>
-<nav class="bottom-nav" aria-label="Навигация"><button class="active" data-page="cases"><span>📦</span>Кейсы</button><button data-page="upgrade"><span>⚡</span>Апгрейд</button><button data-page="inventory"><span>🎒</span>Инвентарь</button></nav>
+<nav class="bottom-nav" aria-label="Навигация"><button class="active" data-page="cases"><span>📦</span>Кейсы</button><button data-page="inventory"><span>🎒</span>Инвентарь</button></nav>
 
 <footer>Демо-игра CS2. Виртуальный баланс сохраняется на этом устройстве.</footer>
 </body></html>
