@@ -15,8 +15,15 @@ function renderInventory(){
  const grid=$('inventory-grid'),count=$('inventory-count');
  if(!grid||!count)return;
  count.textContent=inventory.length+' предметов';
- grid.innerHTML=inventory.length?inventory.slice().reverse().map(item=>'<article class="inventory-item"><div class="inventory-item-art">'+(item.image?'<img src="'+escapeHTML(item.image)+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'">':'')+'<span class="inventory-item-fallback" '+(item.image?'style="display:none"':'')+'>🔫</span></div><div class="inventory-item-info"><b>'+escapeHTML(item.name)+'</b><span>'+escapeHTML(item.rarity||'CS2 skin')+'</span><strong>≈ '+money(item.price)+'</strong></div></article>').join(''):'<div class="inventory-empty"><span>🎒</span><b>Инвентарь пока пуст</b><p>Открой кейс и забери первый предмет — он появится здесь</p><button data-page="cases">Перейти к кейсам</button></div>';
+ grid.innerHTML=inventory.length?inventory.map((item,index)=>({item,index})).reverse().map(({item,index})=>'<article class="inventory-item"><div class="inventory-item-art">'+(item.image?'<img src="'+escapeHTML(item.image)+'" alt="">':'')+'<span class="inventory-item-fallback" '+(item.image?'style="display:none"':'')+'>🔫</span></div><div class="inventory-item-info"><b>'+escapeHTML(item.name)+'</b><span>'+escapeHTML(item.rarity||'CS2 skin')+'</span><strong>≈ '+money(item.price)+'</strong><button class="inventory-sell-button" type="button" data-sell-item="'+index+'">Продать за '+money(item.price)+'</button></div></article>').join(''):'<div class="inventory-empty"><span>🎒</span><b>Инвентарь пока пуст</b><p>Открой кейс и забери первый предмет — он появится здесь</p><button data-page="cases">Перейти к кейсам</button></div>';
  grid.querySelectorAll('[data-page="cases"]').forEach(button=>button.onclick=()=>showPage('cases'));
+ grid.querySelectorAll('[data-sell-item]').forEach(button=>button.onclick=()=>{
+  const index=Number(button.dataset.sellItem),item=inventory[index];
+  if(!Number.isInteger(index)||!item||!Number.isFinite(item.price)||item.price<0)return;
+  inventory.splice(index,1);balance+=item.price;render();
+  const toast=document.createElement('div');toast.className='topup-toast';toast.textContent='Продано: +'+money(item.price);document.body.appendChild(toast);
+  window.setTimeout(()=>toast.remove(),2200);
+ });
 }
 function showPage(page){
  const isInventory=page==='inventory';
