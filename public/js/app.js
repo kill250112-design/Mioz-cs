@@ -280,3 +280,16 @@ const oldUpgradeButton=$('upgrade-start');if(oldUpgradeButton){const fresh=oldUp
  const target={...upgradeTarget},status=modal.querySelector('.upgrade-result-status'),won=Math.random()*100<upgradeChance;
  window.setTimeout(()=>{if(won){inventory.push(target);latestDrop=target.name;status.textContent='УСПЕХ! ПРЕДМЕТ ПОЛУЧЕН';status.classList.add('success')}else{status.textContent='НЕУДАЧА · СТАВКА ПОТЕРЯНА';status.classList.add('failure')}render();const close=document.createElement('button');close.className='upgrade-result-close';close.textContent='ПОНЯТНО';close.onclick=()=>{modal.remove();upgradeBusy=false;updateUpgradePreview()};modal.querySelector('.upgrade-result').appendChild(close)},1500);
 })}
+
+
+/* Safety net: always keep the Upgrader button in the bottom navigation */
+(function ensureUpgradeBottomTab(){
+ const nav=document.querySelector('nav.bottom-nav');
+ if(!nav)return;
+ if(!nav.querySelector('[data-page="upgrade"]')){
+  const button=document.createElement('button');
+  button.type='button';button.dataset.page='upgrade';button.innerHTML='<span>⚡</span>Апгрейд';
+  nav.insertBefore(button,nav.querySelector('[data-page="inventory"]'));
+  button.addEventListener('click',()=>showPage('upgrade'));
+ }
+})();
