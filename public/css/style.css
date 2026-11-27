@@ -185,3 +185,13 @@ button:focus-visible{
 .inventory-sell-button{width:100%;min-height:34px;margin-top:5px;padding:7px 8px;border:1px solid #ffe29a;border-radius:9px;background:linear-gradient(135deg,#ffe39a,#f3bd4f 58%,#bd8a2e);color:#241a08;font-size:10px;font-weight:950;box-shadow:0 4px 12px #d99a3028,inset 0 1px 0 #fff8}
 .inventory-sell-button:hover{filter:brightness(1.08);transform:translateY(-1px)}
 .inventory-sell-button:active{transform:scale(.98)}
+
+/* Clearly visible sell button below every inventory item. */
+.inventory-item{display:grid!important;grid-template-columns:76px minmax(0,1fr);align-items:center;gap:9px 10px}
+.inventory-item-art{grid-column:1;grid-row:1}
+.inventory-item-info{grid-column:2;grid-row:1;min-width:0}
+.inventory-sell-button{grid-column:1/-1!important;grid-row:2!important;display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;min-height:42px!important;margin:0!important;padding:10px 12px!important;border:1px solid #ffe29a!important;border-radius:11px!important;background:linear-gradient(135deg,#ffe39a,#f3bd4f 58%,#bd8a2e)!important;color:#241a08!important;font-size:12px!important;font-weight:950!important;letter-spacing:.5px;box-shadow:0 5px 15px #d99a3035,inset 0 1px 0 #fff9!important}
+.inventory-sell-button:active{transform:scale(.98)}
+.inventory-item-art img{width:100%;height:100%;object-fit:contain}
+.inventory-item-fallback{display:none}
+@media(max-width:520px){.inventory-item{grid-template-columns:70px minmax(0,1fr)}.inventory-sell-button{min-height:44px!important;font-size:12px!important}}
