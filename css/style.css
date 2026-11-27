@@ -171,3 +171,12 @@ button:focus-visible{
 .topup-note{display:block;margin-top:15px;color:#8190a8;font-size:10px;line-height:1.45}
 .topup-toast{position:fixed;z-index:60;left:50%;top:max(18px,env(safe-area-inset-top));transform:translateX(-50%);padding:12px 17px;border:1px solid #b98d43;border-radius:13px;background:#1c2a3d;color:#ffe39a;font-size:12px;font-weight:850;box-shadow:0 10px 30px #0009;animation:inventoryPageIn .2s ease both;white-space:nowrap}
 @media(max-width:520px){.topbar{gap:7px}.top-actions{gap:6px}.balance-pill{gap:5px;padding:8px 9px}.balance-pill strong{font-size:12px}.topup-button{min-height:37px;padding:0 9px;font-size:11px}.topup-dialog{padding:25px 14px 16px}}
+
+/* Rebuilt case roulette: the winning reel card itself is the revealed item. */
+.cs2-reel-track{position:relative;gap:8px;align-items:stretch;transform:translate3d(0,0,0);will-change:transform}
+.cs2-reel-item{flex:0 0 142px;width:142px;min-width:142px}
+.cs2-reel-item.reel-winner{border-color:#e7bf62;box-shadow:inset 0 0 0 1px #f6d77b,0 0 20px #f0bd4b55}
+.cs2-reel-item.reel-winner-final{background:linear-gradient(160deg,#55482c,#263650);box-shadow:inset 0 0 0 2px #ffe08a,0 0 28px #f3c75c99}
+.cs2-reel-item.reel-winner-final .cs2-reel-art{background:radial-gradient(circle,#806b3c,#27364b 72%)}
+.opening-winner{display:none!important}
+@media(max-width:520px){.cs2-reel-item{flex-basis:124px;width:124px;min-width:124px}}
