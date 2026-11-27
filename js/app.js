@@ -1,8 +1,8 @@
-let balance=1000,latestDrop='',inventory=[],caseCatalog=[];
+let balance=1000,latestDrop='',inventory=[],caseCatalog=[],openedCases=0;
 const CASE_PRICE=100;
-try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance);latestDrop=typeof saved.latestDrop==='string'?saved.latestDrop:'';inventory=Array.isArray(saved.inventory)?saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)) : []}}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance);latestDrop=typeof saved.latestDrop==='string'?saved.latestDrop:'';inventory=Array.isArray(saved.inventory)?saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)) : [];openedCases=Number.isInteger(saved.openedCases)&&saved.openedCases>=0?saved.openedCases:0}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
-function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,latestDrop,inventory}))}catch(e){}}
+function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,latestDrop,inventory,openedCases}))}catch(e){}}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function render(){
  saveGame();
@@ -47,15 +47,20 @@ function getCaseDrops(crate){
  const rare=Array.isArray(crate.contains_rare)?crate.contains_rare:[];
  return [...normal.map(x=>normalizeDrop(x)),...rare.map(x=>normalizeDrop(x,true))].filter(x=>x.name!=='Неизвестный предмет');
 }
-function chooseDrop(crate){
+function chooseDrop(crate,forceRare=false){
  const all=getCaseDrops(crate);if(!all.length)return null;
- const groups={};
- all.forEach(drop=>{const key=drop.rarity in rarityWeights?drop.rarity:'Mil-Spec Grade';(groups[key]??=[]).push(drop)});
- const keys=Object.keys(groups),total=keys.reduce((sum,key)=>sum+rarityWeights[key],0);
- let roll=Math.random()*total,grade=keys[keys.length-1];
- for(const key of keys){roll-=rarityWeights[key];if(roll<=0){grade=key;break}}
- const pool=groups[grade]||all,drop={...pool[Math.floor(Math.random()*pool.length)]};
- const range=rarityPrices[grade]||[45,120];
+ const rare=(Array.isArray(crate.contains_rare)?crate.contains_rare:[]).map(x=>normalizeDrop(x,true));
+ let drop;
+ if(forceRare&&rare.length){drop={...rare[Math.floor(Math.random()*rare.length)]};}
+ else{
+  const groups={};
+  all.forEach(item=>{const key=item.rarity in rarityWeights?item.rarity:'Mil-Spec Grade';(groups[key]??=[]).push(item)});
+  const keys=Object.keys(groups),total=keys.reduce((sum,key)=>sum+rarityWeights[key],0);
+  let roll=Math.random()*total,grade=keys[keys.length-1];
+  for(const key of keys){roll-=rarityWeights[key];if(roll<=0){grade=key;break}}
+  const pool=groups[grade]||all;drop={...pool[Math.floor(Math.random()*pool.length)]};
+ }
+ const range=rarityPrices[drop.rarity]||(forceRare?[2500,9000]:[45,120]);
  drop.price=Math.round(range[0]+Math.random()*(range[1]-range[0]));
  return drop;
 }
@@ -64,12 +69,15 @@ function dropCard(drop,index,isWinner=false){
 }
 function showOpening(crate){
  const modal=document.createElement('div');modal.className='modal';modal.id='case-opening-modal';
- modal.innerHTML='<div class="dialog"><button class="close" id="opening-close" aria-label="Закрыть">×</button><div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>'+escapeHTML(crate.name)+'</h2><p>Предмет остановится точно под указателем</p></div><div class="opening-stage"><div class="cs2-reel"><div class="cs2-reel-track" id="reel-track"></div></div><div class="opening-pointer"></div><div class="case-burst" id="case-burst"><i class="burst-ring"></i><div class="burst-box">📦</div><span>ГОТОВИМ РУЛЕТКУ</span></div></div><div class="opening-status" id="opening-status"><i class="opening-pulse"></i>ПОДГОТОВКА</div><div id="opening-result" class="hidden"><h3 class="opening-drop-name" id="opening-drop-name"></h3><b class="opening-drop-price" id="opening-drop-price"></b><button class="opening-claim" id="opening-claim">Забрать предмет</button></div><div class="opening-footnote">Демо-режим · стоимость открытия '+money(CASE_PRICE)+'</div></div>';
+ modal.innerHTML='<div class="dialog"><button class="close" id="opening-close" aria-label="Закрыть">×</button><div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>'+escapeHTML(crate.name)+'</h2><p>Каждый 40-й кейс гарантирует редкий предмет, если он есть в кейсе</p></div><div class="opening-stage"><div class="cs2-reel"><div class="cs2-reel-track" id="reel-track"></div></div><div class="opening-pointer"></div><div class="case-burst" id="case-burst"><i class="burst-ring"></i><div class="burst-box">📦</div><span>ГОТОВИМ РУЛЕТКУ</span></div></div><div class="opening-status" id="opening-status"><i class="opening-pulse"></i>ПОДГОТОВКА</div><div id="opening-result" class="hidden"><h3 class="opening-drop-name" id="opening-drop-name"></h3><b class="opening-drop-price" id="opening-drop-price"></b><button class="opening-claim" id="opening-claim">Забрать предмет</button></div><div class="opening-footnote">Демо-режим · стоимость открытия '+money(CASE_PRICE)+'</div></div>';
  document.body.appendChild(modal);
  let closed=false,claimed=false;
  const close=()=>{if(closed)return;closed=true;modal.remove()};
  $('opening-close').onclick=close;modal.addEventListener('click',e=>{if(e.target===modal)close()});
- const winner=chooseDrop(crate);
+ openedCases++;
+ const isFortieth=openedCases%40===0;
+ saveGame();
+ const winner=chooseDrop(crate,isFortieth);
  if(!winner){$('opening-status').textContent='В этом кейсе пока нет предметов.';return}
  const drops=getCaseDrops(crate),track=$('reel-track'),winnerIndex=38,reelLength=48;
  const reel=Array.from({length:reelLength},()=>drops[Math.floor(Math.random()*drops.length)]);
