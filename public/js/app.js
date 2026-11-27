@@ -31,54 +31,69 @@ document.querySelectorAll('.bottom-nav [data-page]').forEach(button=>button.addE
 const CASES_API='https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/crates.json';
 const rarityWeights={'Consumer Grade':79.92,'Industrial Grade':15.98,'Mil-Spec Grade':3.2,'Restricted':0.64,'Classified':0.128,'Covert':0.0256,'Extraordinary':0.0064};
 const rarityPrices={'Consumer Grade':[8,22],'Industrial Grade':[20,55],'Mil-Spec Grade':[45,120],'Restricted':[100,260],'Classified':[220,650],'Covert':[600,1800],'Extraordinary':[2500,9000]};
-function normalizeDrop(item){
- const rarity=item.rarity||item.rarity_name||{},rarityName=typeof rarity==='string'?rarity:(rarity.name||rarity.localized_name||'Mil-Spec Grade');
+function normalizeDrop(item,forceRare=false){
+ const rarity=item.rarity||item.rarity_name||{},rarityName=typeof rarity==='string'?rarity:(rarity.name||rarity.localized_name||(forceRare?'Extraordinary':'Mil-Spec Grade'));
  return {name:item.name||'Неизвестный предмет',image:item.image||'',rarity:rarityName,icon:'🔫'};
 }
 function getCaseDrops(crate){
  const normal=Array.isArray(crate.contains)?crate.contains:[];
  const rare=Array.isArray(crate.contains_rare)?crate.contains_rare:[];
- return [...normal,...rare].filter(x=>x&&x.name).map(normalizeDrop);
+ return [...normal.map(x=>normalizeDrop(x)),...rare.map(x=>normalizeDrop(x,true))].filter(x=>x.name!=='Неизвестный предмет');
 }
 function chooseDrop(crate){
- const normal=(crate.contains||[]).filter(x=>x&&x.name).map(normalizeDrop);
- const rare=(crate.contains_rare||[]).filter(x=>x&&x.name).map(x=>({...normalizeDrop(x),rarity:'Extraordinary'}));
- const all=[...normal,...rare];if(!all.length)return null;
- const groups={};all.forEach(x=>{const key=x.rarity in rarityWeights?x.rarity:'Mil-Spec Grade';(groups[key]??=[]).push(x)});
- const available=Object.keys(groups),total=available.reduce((sum,key)=>sum+(rarityWeights[key]||1),0);
- let roll=Math.random()*total,selected=available[0];
- for(const key of available){roll-=rarityWeights[key]||1;if(roll<=0){selected=key;break}}
- const pool=groups[selected]||all,drop={...pool[Math.floor(Math.random()*pool.length)]};
- const range=rarityPrices[selected]||[45,120];drop.price=Math.round(range[0]+Math.random()*(range[1]-range[0]));return drop;
+ const all=getCaseDrops(crate);if(!all.length)return null;
+ const groups={};
+ all.forEach(drop=>{const key=drop.rarity in rarityWeights?drop.rarity:'Mil-Spec Grade';(groups[key]??=[]).push(drop)});
+ const keys=Object.keys(groups),total=keys.reduce((sum,key)=>sum+rarityWeights[key],0);
+ let roll=Math.random()*total,grade=keys[keys.length-1];
+ for(const key of keys){roll-=rarityWeights[key];if(roll<=0){grade=key;break}}
+ const pool=groups[grade]||all,drop={...pool[Math.floor(Math.random()*pool.length)]};
+ const range=rarityPrices[grade]||[45,120];
+ drop.price=Math.round(range[0]+Math.random()*(range[1]-range[0]));
+ return drop;
 }
-function dropCard(drop){return '<div class="cs2-reel-item"><div class="cs2-reel-art">'+(drop.image?'<img class="cs2-reel-image" src="'+escapeHTML(drop.image)+'" alt="" onerror="this.style.display=\'none\'">':'<span class="skin-fallback">🔫</span>')+'</div><b>'+escapeHTML(drop.name)+'</b></div>'}
+function dropCard(drop,index,isWinner=false){
+ return '<div class="cs2-reel-item'+(isWinner?' reel-winner':'')+'" data-reel-index="'+index+'"><div class="cs2-reel-art">'+(drop.image?'<img class="cs2-reel-image" src="'+escapeHTML(drop.image)+'" alt="" draggable="false" onerror="this.style.display=\'none\'">':'<span class="skin-fallback">🔫</span>')+'</div><b>'+escapeHTML(drop.name)+'</b></div>';
+}
 function showOpening(crate){
  const modal=document.createElement('div');modal.className='modal';modal.id='case-opening-modal';
- modal.innerHTML='<div class="dialog"><button class="close" id="opening-close" aria-label="Закрыть">×</button><div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>'+escapeHTML(crate.name)+'</h2><p>Удачи! Посмотрим, что внутри.</p></div><div class="opening-stage"><div class="cs2-reel"><div class="cs2-reel-track" id="reel-track"></div></div><div class="opening-pointer"></div><div class="case-burst" id="case-burst"><i class="burst-ring"></i><div class="burst-box">📦</div><span>ОТКРЫВАЕМ КЕЙС</span></div></div><div class="opening-status" id="opening-status"><i class="opening-pulse"></i>ПОДГОТОВКА</div><div id="opening-result" class="hidden"><h3 class="opening-drop-name" id="opening-drop-name"></h3><b class="opening-drop-price" id="opening-drop-price"></b><button class="opening-claim" id="opening-claim">Забрать предмет</button></div><div class="opening-footnote">Демо-режим · стоимость открытия '+money(CASE_PRICE)+'</div></div>';
+ modal.innerHTML='<div class="dialog"><button class="close" id="opening-close" aria-label="Закрыть">×</button><div class="opening-top"><span class="opening-kicker">CS2 CASE OPENING</span><h2>'+escapeHTML(crate.name)+'</h2><p>Предмет остановится точно под указателем</p></div><div class="opening-stage"><div class="cs2-reel"><div class="cs2-reel-track" id="reel-track"></div></div><div class="opening-pointer"></div><div class="case-burst" id="case-burst"><i class="burst-ring"></i><div class="burst-box">📦</div><span>ГОТОВИМ РУЛЕТКУ</span></div></div><div class="opening-status" id="opening-status"><i class="opening-pulse"></i>ПОДГОТОВКА</div><div id="opening-result" class="hidden"><h3 class="opening-drop-name" id="opening-drop-name"></h3><b class="opening-drop-price" id="opening-drop-price"></b><button class="opening-claim" id="opening-claim">Забрать предмет</button></div><div class="opening-footnote">Демо-режим · стоимость открытия '+money(CASE_PRICE)+'</div></div>';
  document.body.appendChild(modal);
- const close=()=>modal.remove();$('opening-close').onclick=close;
- modal.addEventListener('click',e=>{if(e.target===modal)close()});
- const winner=chooseDrop(crate);if(!winner){$('opening-status').textContent='В этом кейсе пока нет списка предметов.';return}
- const drops=getCaseDrops(crate);const track=$('reel-track'),winnerIndex=52;
- const reel=Array.from({length:60},(_,i)=>i===winnerIndex?winner:drops[Math.floor(Math.random()*drops.length)]);
- track.innerHTML=reel.map(dropCard).join('');
+ let closed=false,claimed=false;
+ const close=()=>{if(closed)return;closed=true;modal.remove()};
+ $('opening-close').onclick=close;modal.addEventListener('click',e=>{if(e.target===modal)close()});
+ const winner=chooseDrop(crate);
+ if(!winner){$('opening-status').textContent='В этом кейсе пока нет предметов.';return}
+ const drops=getCaseDrops(crate),track=$('reel-track'),winnerIndex=38,reelLength=48;
+ const reel=Array.from({length:reelLength},()=>drops[Math.floor(Math.random()*drops.length)]);
+ reel[winnerIndex]=winner;
+ track.innerHTML=reel.map((drop,index)=>dropCard(drop,index,index===winnerIndex)).join('');
  const status=$('opening-status'),burst=$('case-burst'),result=$('opening-result');
- window.setTimeout(()=>{
+ const startSpin=()=>{
+  if(closed)return;
   burst.classList.add('burst-out');status.innerHTML='<i class="opening-pulse"></i>РУЛЕТКА КРУТИТСЯ…';
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-   const stage=modal.querySelector('.opening-stage'),winningCard=track.children[winnerIndex];
-   track.style.transition='none';track.style.transform='translate3d(0,0,0)';track.getBoundingClientRect();
-   const stageRect=stage.getBoundingClientRect(),cardRect=winningCard.getBoundingClientRect();
-   const offset=stageRect.left+stageRect.width/2-(cardRect.left+cardRect.width/2);
-   track.style.transition='transform 6.2s cubic-bezier(.08,.72,.08,1)';track.style.transform='translate3d('+offset+'px,0,0)';
-  }));
+  track.style.transition='none';track.style.transform='translate3d(0,0,0)';
+  track.getBoundingClientRect();
+  const stage=modal.querySelector('.opening-stage'),card=track.querySelector('[data-reel-index="'+winnerIndex+'"]');
+  const stageRect=stage.getBoundingClientRect(),cardRect=card.getBoundingClientRect();
+  const targetX=(stageRect.left+stageRect.width/2)-(cardRect.left+cardRect.width/2);
+  const duration=6200;
+  requestAnimationFrame(()=>{if(closed)return;track.style.transition='transform '+duration+'ms cubic-bezier(.08,.72,.08,1)';track.style.transform='translate3d('+targetX+'px,0,0)'});
   window.setTimeout(()=>{
-   status.textContent='ВЫПАЛ ПРЕДМЕТ!';$('opening-drop-name').textContent=winner.name;$('opening-drop-price').textContent='≈ '+money(winner.price);
-   result.classList.remove('hidden');const stage=modal.querySelector('.opening-stage');
-   stage.insertAdjacentHTML('beforeend','<div class="opening-winner">'+(winner.image?'<img class="reveal-image" src="'+escapeHTML(winner.image)+'" alt="'+escapeHTML(winner.name)+'" onerror="this.style.display=\'none\'">':'<span class="burst-box">🔫</span>')+'</div>');
-   $('opening-claim').onclick=()=>{latestDrop=winner.name;inventory.push({...winner});render();close()};
-  },6400);
- },800);
+   if(closed)return;
+   // Keep the actual winning reel card visible; no separate image is layered over a different card.
+   status.textContent='ВЫПАЛ ПРЕДМЕТ!';
+   card.classList.add('reel-winner-final');
+   $('opening-drop-name').textContent=winner.name;
+   $('opening-drop-price').textContent='≈ '+money(winner.price);
+   result.classList.remove('hidden');
+   $('opening-claim').onclick=()=>{
+    if(closed||claimed)return;claimed=true;
+    latestDrop=winner.name;inventory.push({...winner});render();close();
+   };
+  },duration+180);
+ };
+ window.setTimeout(startSpin,650);
 }
 async function renderCaseCatalog(){
  const grid=$('case-catalog-grid'),count=$('case-count');if(!grid||!count)return;
