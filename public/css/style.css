@@ -195,3 +195,15 @@ button:focus-visible{
 .inventory-item-art img{width:100%;height:100%;object-fit:contain}
 .inventory-item-fallback{display:none}
 @media(max-width:520px){.inventory-item{grid-template-columns:70px minmax(0,1fr)}.inventory-sell-button{min-height:44px!important;font-size:12px!important}}
+
+
+/* Category switch above the case catalogue */
+.case-category-tabs{display:flex;gap:9px;margin:18px 0 16px;padding:5px;border:1px solid #35445e;border-radius:14px;background:#111a29}
+.case-category-tab{flex:1;min-height:42px;padding:9px 12px;border:1px solid transparent;border-radius:10px;background:transparent;color:#aebbd1;font-size:12px;font-weight:900;letter-spacing:.3px}
+.case-category-tab.active{border-color:#ffe29a;background:linear-gradient(135deg,#ffe39a,#f3bd4f 58%,#bd8a2e);color:#241a08;box-shadow:0 5px 15px #d99a3035,inset 0 1px 0 #fff9}
+.custom-cases-section{min-height:170px}
+.custom-cases-empty{display:grid;justify-items:center;gap:9px;padding:30px 18px;border:1px dashed #66552f;border-radius:16px;background:linear-gradient(145deg,#1b2940,#111a29);text-align:center}
+.custom-cases-empty>span{color:#f5c75e;font-size:28px}
+.custom-cases-empty>b{font-size:15px;color:#ffe3a0}
+.custom-cases-empty p{max-width:330px;margin:0;color:#91a0b9;font-size:12px;line-height:1.55}
+@media(max-width:520px){.case-category-tabs{gap:6px;margin-top:14px}.case-category-tab{min-height:40px;font-size:11px}}
