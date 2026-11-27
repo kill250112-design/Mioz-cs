@@ -1,6 +1,6 @@
 let balance=1000,latestDrop='',inventory=[],caseCatalog=[],openedCases=0;
 const CASE_PRICE=100;
-try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance);latestDrop=typeof saved.latestDrop==='string'?saved.latestDrop:'';inventory=Array.isArray(saved.inventory)?saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)) : [];openedCases=Number.isInteger(saved.openedCases)&&saved.openedCases>=0?saved.openedCases:0}}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem('cs2cases-save')||'null');if(saved&&Number.isFinite(saved.balance)){balance=Math.max(0,saved.balance);latestDrop=typeof saved.latestDrop==='string'?saved.latestDrop:'';inventory=Array.isArray(saved.inventory)?saved.inventory:[];inventory=Array.isArray(saved.inventory)?saved.inventory.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.price)) : [];openedCases=Number.isInteger(saved.openedCases)&&saved.openedCases>=0?saved.openedCases:0}}catch(e){}
 const $=id=>document.getElementById(id),money=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
 function saveGame(){try{localStorage.setItem('cs2cases-save',JSON.stringify({balance,latestDrop,inventory,openedCases}))}catch(e){}}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
@@ -132,3 +132,26 @@ async function renderCaseCatalog(){
 renderCaseCatalog();
 
 
+
+
+function renderInventory(){
+ const grid=$('inventory-grid'),count=$('inventory-count');if(!grid||!count)return;
+ count.textContent=inventory.length+' предметов';
+ if(!inventory.length){grid.innerHTML='<p class="case-catalog-loading">Пока пусто. Открой кейс!</p>';return}
+ grid.innerHTML=inventory.map((item,index)=>'<article class="inventory-card"><div class="inventory-art">'+(item.image?'<img src="'+escapeHTML(item.image)+'" alt="" onerror="this.style.display=\'none\'">':'🔫')+'</div><h3>'+escapeHTML(item.name)+'</h3><span class="inventory-price">≈ '+money(item.price||0)+'</span><button type="button" data-sell-item="'+index+'">ПРОДАТЬ</button></article>').join('');
+ grid.querySelectorAll('[data-sell-item]').forEach(button=>button.onclick=()=>{const index=Number(button.dataset.sellItem),item=inventory[index];if(!item)return;balance+=Number(item.price)||0;inventory.splice(index,1);render()});
+}
+function showPage(page){
+ const inventoryPage=page==='inventory';
+ $('case-catalog').classList.toggle('hidden',inventoryPage);
+ $('home-dashboard').classList.toggle('hidden',inventoryPage);
+ $('inventory-page').classList.toggle('hidden',!inventoryPage);
+ $('nav-cases').classList.toggle('active',!inventoryPage);
+ $('nav-inventory').classList.toggle('active',inventoryPage);
+}
+$('nav-cases').onclick=()=>showPage('cases');
+$('nav-inventory').onclick=()=>showPage('inventory');
+$('topup-open').onclick=()=>$('topup-modal').classList.remove('hidden');
+$('topup-close').onclick=()=>$('topup-modal').classList.add('hidden');
+$('topup-modal').addEventListener('click',e=>{if(e.target===$('topup-modal'))$('topup-modal').classList.add('hidden')});
+document.querySelectorAll('[data-topup]').forEach(button=>button.onclick=()=>{balance+=Number(button.dataset.topup)||0;render();$('topup-modal').classList.add('hidden')});
