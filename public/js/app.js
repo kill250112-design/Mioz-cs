@@ -102,20 +102,26 @@ function showOpening(crate){
  };
  window.setTimeout(startSpin,650);
 }
+function paintCaseCatalog(data){
+ const grid=$('case-catalog-grid'),count=$('case-count');if(!grid||!count)return;
+ const catalog=data.filter(item=>item&&item.type==='Case'&&/case/i.test(item.name||'')&&getCaseDrops(item).length)
+  .sort((a,b)=>String(b.first_sale_date||'').localeCompare(String(a.first_sale_date||'')));
+ if(!catalog.length)return false;
+ caseCatalog=catalog;count.textContent=caseCatalog.length+' кейсов';
+ grid.innerHTML=caseCatalog.map((item,index)=>'<article class="case-catalog-card"><div class="case-catalog-art"><img src="'+escapeHTML(item.image||'')+'" alt="'+escapeHTML(item.name)+'" loading="lazy" decoding="async"><span class="case-image-fallback" aria-hidden="true">📦</span></div><div class="case-catalog-info"><h3>'+escapeHTML(item.name)+'</h3><span>'+(item.first_sale_date?new Date(item.first_sale_date+'T00:00:00').toLocaleDateString('ru-RU'):'CS2')+'</span></div><button class="case-open-button" data-open-case="'+index+'">ОТКРЫТЬ · '+money(CASE_PRICE)+'</button></article>').join('');
+ grid.querySelectorAll('.case-catalog-art img').forEach(img=>img.addEventListener('error',()=>{img.style.display='none';img.nextElementSibling.style.display='grid'},{once:true}));
+ grid.querySelectorAll('[data-open-case]').forEach(button=>button.onclick=()=>{if(balance<CASE_PRICE){alert('Недостаточно средств! Нужно '+money(CASE_PRICE)+'.');return}const crate=caseCatalog[Number(button.dataset.openCase)];balance-=CASE_PRICE;render();showOpening(crate)});
+ return true;
+}
 async function renderCaseCatalog(){
  const grid=$('case-catalog-grid'),count=$('case-count');if(!grid||!count)return;
+ const cacheName='cs2-case-catalog-v1';let hadCache=false;
+ try{if('caches' in window){const cache=await caches.open(cacheName),cached=await cache.match(CASES_API);if(cached){const data=await cached.json();hadCache=paintCaseCatalog(data);}}}catch(error){console.warn('CS2 catalog cache:',error)}
  try{
-  const response=await fetch(CASES_API,{cache:'no-cache'});if(!response.ok)throw new Error('Не удалось загрузить каталог');
-  const data=await response.json();
-  caseCatalog=data.filter(item=>item&&item.type==='Case'&&/case/i.test(item.name||'')&&getCaseDrops(item).length)
-   .sort((a,b)=>String(b.first_sale_date||'').localeCompare(String(a.first_sale_date||'')));
-  if(!caseCatalog.length)throw new Error('Список кейсов пока недоступен');
-  count.textContent=caseCatalog.length+' кейсов';
-  grid.innerHTML=caseCatalog.map((item,index)=>'<article class="case-catalog-card"><div class="case-catalog-art"><img src="'+escapeHTML(item.image||'')+'" alt="'+escapeHTML(item.name)+'" loading="'+(index<6?'eager':'lazy')+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><span class="case-image-fallback" aria-hidden="true">📦</span></div><div class="case-catalog-info"><h3>'+escapeHTML(item.name)+'</h3><span>'+(item.first_sale_date?new Date(item.first_sale_date+'T00:00:00').toLocaleDateString('ru-RU'):'CS2')+'</span></div><button class="case-open-button" data-open-case="'+index+'">ОТКРЫТЬ · '+money(CASE_PRICE)+'</button></article>').join('');
-  grid.querySelectorAll('[data-open-case]').forEach(button=>button.onclick=()=>{if(balance<CASE_PRICE){alert('Недостаточно средств! Нужно '+money(CASE_PRICE)+'.');return}const crate=caseCatalog[Number(button.dataset.openCase)];balance-=CASE_PRICE;render();showOpening(crate)});
- }catch(error){
-  count.textContent='Каталог недоступен';grid.innerHTML='<p class="case-catalog-loading">Не получилось загрузить кейсы. Проверь подключение к интернету и обнови страницу.</p>';console.error('CS2 case catalog:',error);
- }
+  const response=await fetch(CASES_API,{cache:'force-cache'});if(!response.ok)throw new Error('Не удалось загрузить каталог');
+  const data=await response.json();if(!paintCaseCatalog(data))throw new Error('Список кейсов пока недоступен');
+  if('caches' in window){try{const cache=await caches.open(cacheName);await cache.put(CASES_API,new Response(JSON.stringify(data),{headers:{'Content-Type':'application/json'}}));}catch(error){console.warn('Не удалось сохранить каталог:',error)}}
+ }catch(error){if(!hadCache){count.textContent='Каталог недоступен';grid.innerHTML='<p class="case-catalog-loading">Не получилось загрузить кейсы. Проверь подключение к интернету и обнови страницу.</p>';}console.error('CS2 case catalog:',error)}
 }
 renderCaseCatalog();
 
