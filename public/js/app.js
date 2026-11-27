@@ -66,7 +66,8 @@ function showOpening(crate){
  window.setTimeout(()=>{
   burst.classList.add('burst-out');status.innerHTML='<i class="opening-pulse"></i>РУЛЕТКА КРУТИТСЯ…';
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-   const cardWidth=150,cardCenter=winnerIndex*cardWidth+71,offset=Math.max(0,modal.querySelector('.opening-stage').clientWidth/2-cardCenter);
+   const cardWidth=150,cardCenter=winnerIndex*cardWidth+71,offset=modal.querySelector('.opening-stage').clientWidth/2-cardCenter;
+   track.style.transition='none';track.style.transform='translate3d(0,0,0)';track.getBoundingClientRect();
    track.style.transition='transform 6.2s cubic-bezier(.08,.72,.08,1)';track.style.transform='translate3d('+offset+'px,0,0)';
   }));
   window.setTimeout(()=>{
