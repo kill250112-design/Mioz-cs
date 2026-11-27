@@ -26,7 +26,6 @@ function renderInventory(){
 }
 function showPage(page){
  const isInventory=page==='inventory';
- $('home-dashboard').classList.toggle('hidden',isInventory);
  $('case-catalog').classList.toggle('hidden',isInventory);
  $('inventory-page').classList.toggle('hidden',!isInventory);
  document.querySelectorAll('.bottom-nav [data-page]').forEach(button=>button.classList.toggle('active',button.dataset.page===page));
