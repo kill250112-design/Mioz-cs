@@ -144,7 +144,6 @@ function renderInventory(){
 function showPage(page){
  const inventoryPage=page==='inventory';
  $('case-catalog').classList.toggle('hidden',inventoryPage);
- $('home-dashboard').classList.toggle('hidden',inventoryPage);
  $('inventory-page').classList.toggle('hidden',!inventoryPage);
  $('nav-cases').classList.toggle('active',!inventoryPage);
  $('nav-inventory').classList.toggle('active',inventoryPage);
